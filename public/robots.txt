@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.jhcdotcomclub.com/sitemap.xml
+
+# Disallow admin pages
+Disallow: /admin/
+Disallow: /api/
+
+# Allow important pages
+Allow: /
+Allow: /events
+Allow: /about-us
+Allow: /contact-us
+Allow: /sponsors
+Allow: /teams
+Allow: /register
+Allow: /magazines
+Allow: /past-events
+Allow: /privacy-policy
+Allow: /terms-and-conditions
+Allow: /refund-policy
+Allow: /llm.json
+
+# Crawl delay
+Crawl-delay: 1

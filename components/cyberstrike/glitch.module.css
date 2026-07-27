@@ -1,0 +1,154 @@
+.glitchShell {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transform-style: preserve-3d;
+    perspective: 1800px;
+}
+
+.glitch {
+    position: relative;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #f8fafc;
+    transform: rotateY(-16deg) rotateX(6deg);
+    transform-style: preserve-3d;
+    text-shadow: 0 0 24px rgba(255, 98, 98, 0.45), 0 0 6px rgba(96, 165, 250, 0.35);
+    filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.75));
+}
+
+.glitch span {
+    display: block;
+    line-height: 0.92;
+}
+
+.glitch[data-intense="true"]::before,
+.glitch[data-intense="true"]::after {
+    animation-duration: 1.15s;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    text-shadow: none;
+}
+
+.glitch::before {
+    color: #60a5fa;
+    transform: translate3d(-5px, -2px, -6px) skewX(-1deg);
+    clip-path: inset(6% 0 15% 0);
+    animation: glitchShift 1.8s steps(12) infinite;
+}
+
+.glitch::after {
+    color: #f97373;
+    transform: translate3d(5px, 2px, -8px) skewX(1deg);
+    clip-path: inset(60% 0 0 0);
+    animation: glitchShift 2.4s steps(14) infinite reverse;
+}
+
+.glitchOverlay {
+    position: absolute;
+    inset: -8%;
+    background-color: rgba(12, 12, 12, 0.92);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.12), 0 12px 45px rgba(0, 0, 0, 0.8);
+    transform: translateZ(-30px) rotateY(-6deg);
+    pointer-events: none;
+}
+
+.glitchScanline::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.18;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Crect width='4' height='1' fill='rgba(241,245,249,0.12)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    animation: scanline 6s linear infinite;
+}
+
+.glitchNoise::after {
+    content: "";
+    position: absolute;
+    inset: -15%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    opacity: 0.2;
+    mix-blend-mode: soft-light;
+    animation: noise 1.6s steps(6) infinite;
+}
+
+@keyframes glitchShift {
+    0% {
+        clip-path: inset(0 0 0 0);
+    }
+
+    10% {
+        clip-path: inset(12% 0 65% 0);
+    }
+
+    25% {
+        clip-path: inset(35% 0 25% 0);
+    }
+
+    40% {
+        clip-path: inset(5% 0 45% 0);
+    }
+
+    55% {
+        clip-path: inset(60% 0 5% 0);
+    }
+
+    70% {
+        clip-path: inset(20% 0 40% 0);
+    }
+
+    85% {
+        clip-path: inset(70% 0 10% 0);
+    }
+
+    100% {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+@keyframes scanline {
+    0% {
+        transform: translateY(-12%);
+    }
+
+    100% {
+        transform: translateY(12%);
+    }
+}
+
+@keyframes noise {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+
+    20% {
+        transform: translate3d(-10%, -5%, 0);
+    }
+
+    40% {
+        transform: translate3d(8%, -3%, 0);
+    }
+
+    60% {
+        transform: translate3d(-4%, 6%, 0);
+    }
+
+    80% {
+        transform: translate3d(6%, -2%, 0);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+}
