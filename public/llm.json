@@ -1,0 +1,60 @@
+{
+  "name": "JHC Dot Com Club",
+  "description": "JHC Dot Com Club is a premier technology and innovation community focused on fostering collaboration, learning, and growth in the digital space. We organize events, workshops, hackathons, and provide networking opportunities for tech enthusiasts, entrepreneurs, and professionals.",
+  "version": "1.0.0",
+  "website": "https://www.jhcdotcomclub.com",
+  "type": "technology_community",
+  "status": "active",
+  "founded": "2024",
+  "contact": {
+    "website": "https://www.jhcdotcomclub.com/contact-us",
+    "register": "https://www.jhcdotcomclub.com/register"
+  },
+  "services": [
+    "Technology Events",
+    "Workshops",
+    "Hackathons",
+    "Networking",
+    "Learning Programs",
+    "Community Building"
+  ],
+  "pages": {
+    "home": "https://www.jhcdotcomclub.com/",
+    "about": "https://www.jhcdotcomclub.com/about-us",
+    "events": "https://www.jhcdotcomclub.com/events",
+    "past_events": "https://www.jhcdotcomclub.com/past-events",
+    "teams": "https://www.jhcdotcomclub.com/teams",
+    "sponsors": "https://www.jhcdotcomclub.com/sponsors",
+    "magazines": "https://www.jhcdotcomclub.com/magzines",
+    "register": "https://www.jhcdotcomclub.com/register",
+    "contact": "https://www.jhcdotcomclub.com/contact-us",
+    "privacy_policy": "https://www.jhcdotcomclub.com/privacy-policy",
+    "terms_conditions": "https://www.jhcdotcomclub.com/terms-and-conditions",
+    "refund_policy": "https://www.jhcdotcomclub.com/refund-policy"
+  },
+  "technologies": [
+    "Next.js",
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "Framer Motion",
+    "GSAP"
+  ],
+  "features": [
+    "Event Management",
+    "Registration System",
+    "Team Profiles",
+    "Sponsor Showcase",
+    "Magazine/Publication System",
+    "Contact Forms",
+    "Responsive Design",
+    "SEO Optimized"
+  ],
+  "ai_agent_notes": {
+    "purpose": "This file helps AI agents understand the JHC Dot Com Club website structure, services, and capabilities for better assistance and indexing.",
+    "last_updated": "2025-07-09",
+    "crawlable": true,
+    "sitemap": "https://www.jhcdotcomclub.com/sitemap.xml",
+    "robots": "https://www.jhcdotcomclub.com/robots.txt"
+  }
+}

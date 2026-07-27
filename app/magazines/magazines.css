@@ -1,0 +1,137 @@
+/* magazines.css */
+
+/* === Card Hover Border Animation === */
+/* .card-hover {
+  position: relative;
+  border: 2px solid transparent; */
+/* border-radius: 0.75rem; matches Tailwind rounded-xl */
+/* transition: all 0.3s ease; */
+/* overflow: hidden;
+}
+
+.card-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #b30000; red glow border */
+/* border-radius: 0.75rem;
+  transform: scale(0);
+  transition: transform 0.35s ease;
+  pointer-events: none;
+}
+
+.card-hover:hover::before {
+  transform: scale(1);
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 20px #a60019;
+} */
+/* Simplified card hover to match homepage style */
+.card-hover {
+  position: relative;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+}
+
+
+/* === Scroll Reveal Animation === */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Removed neon text effects to match homepage */
+
+/* Removed button glow effect to match homepage */
+
+/* === Image Hover Scale === */
+img {
+  transition: transform 0.5s ease-in-out;
+}
+
+img:hover {
+  transform: scale(1.05);
+}
+
+/* === Background for Magazines Section === */
+.magazine-section {
+  background: linear-gradient(135deg, #1a0000, #330000, #260c0c, #ee0707);
+  background-size: 400% 400%;
+  animation: electricFlow 10s ease infinite;
+}
+
+.hero-section video {
+  object-fit: cover;
+  /* ensures video covers full container */
+  object-position: center;
+  /* default center, can adjust for important parts */
+  width: 100%;
+  height: 100%;
+}
+
+/* Removed subtitle neon effects to match homepage */
+
+@keyframes electricFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* === Responsive Adjustments === */
+
+/* Small screens */
+@media (max-width: 640px) {
+  .scroll-reveal {
+    transform: translateY(10px);
+  }
+
+  .card-hover {
+    border-radius: 0.5rem;
+  }
+}
+
+/* Medium screens */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .scroll-reveal {
+    transform: translateY(15px);
+  }
+}
+
+/* Large screens */
+@media (min-width: 1025px) {
+  .scroll-reveal {
+    transform: translateY(20px);
+  }
+}
+
+@media (min-width: 768px) {
+  .hero-section video {
+    object-position: top;
+    /* shows top part on larger screens */
+  }
+}
+
+.hero-section .bg-gradient-to-b {
+  transition: all 0.5s ease-in-out;
+}
