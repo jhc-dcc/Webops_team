@@ -44,7 +44,7 @@ const navItems = [
   },
   {
     name: "E-waste",
-    link: "/ewaste-25",
+    link: "/ewaste-26",
   }
 ];
 

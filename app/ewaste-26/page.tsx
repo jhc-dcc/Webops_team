@@ -63,7 +63,6 @@ const CHART_TOOLTIP_ITEM_STYLE = {
   padding: 0,
   lineHeight: 1.2,
 };
-
 const MOCK_INDIVIDUALS = [
   { rank: 1, name: "Rudra Sharma", wasteWeight: 85.5, wasteTypes: ["Laptops", "Mobiles"], submittedAt: Date.now() - 2 * 24 * 3600 * 1000, category: "Laptop", department: "Computer Science" },
   { rank: 2, name: "Vaishnovee Iyer", wasteWeight: 72.3, wasteTypes: ["Mobiles", "Cables"], submittedAt: Date.now() - 3 * 24 * 3600 * 1000, category: "Mobile", department: "Information Technology" },
@@ -487,11 +486,33 @@ export default function EWasteDrive2026() {
   const trendData = MOCK_DAILY_TREND;
 
   return (
-    <div className="relative min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-neutral-950 text-neutral-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-300">
-      {/* Dynamic Ambient Background Elements — clipped so they don't widen the page */}
+    <div className="relative min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-[#050505] text-neutral-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-300">
+      {/* Modern Premium Background Layer System */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute top-0 left-1/4 w-[min(500px,100vw)] h-[500px] bg-emerald-500/5 rounded-full blur-[120px]" />
-        <div className="absolute top-1/3 right-0 w-[min(400px,80vw)] h-[400px] bg-teal-500/5 rounded-full blur-[100px]" />
+        {/* 1. Subtle 1px grid pattern (1.5-2% opacity) */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 1px, transparent 1px)`,
+            backgroundSize: "40px 40px"
+          }}
+        />
+
+        {/* 2. Fine grain/noise texture overlay (2% opacity) */}
+        <div 
+          className="absolute inset-0 opacity-[0.02] mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+          }}
+        />
+
+        {/* 3. Soft vignette overlay keeping deep pitch black edges */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(ellipse at center, transparent 40%, rgba(5, 5, 5, 0.95) 100%)"
+          }}
+        />
       </div>
 
       {/* Hero Section */}
@@ -506,6 +527,15 @@ export default function EWasteDrive2026() {
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent" />
         
         <div className="relative z-10 text-center max-w-4xl mx-auto px-4 py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="mb-4 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-semibold tracking-wide">
+              Eco-Drive 2026
+            </Badge>
+          </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -557,21 +587,28 @@ export default function EWasteDrive2026() {
                     setActiveTab(val as "individuals" | "organizations");
                     setIsExpanded(false);
                   }}
-                  layoutId="ewaste-25-segmented-pill"
+                  layoutId="ewaste-26-segmented-pill"
                 />
               </div>
 
               {/* PODIUM (Top 3 Contributors) */}
-              <div className="w-full">
-                {podiumItems.length === 0 ? (
-                  <div className="text-center py-16 bg-neutral-900/20 border border-neutral-900 rounded-3xl">
-                    <Recycle className="w-12 h-12 text-neutral-700 mx-auto mb-4 animate-spin" />
-                    <p className="text-neutral-400">No entries recorded yet.</p>
-                  </div>
-                ) : (
-                  <>
-                    {/* Podium (Ranks 2, 1, 3) — same layout on all screen sizes */}
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-4 md:gap-6 items-end pt-8 sm:pt-10 md:pt-12 pb-2 min-w-0">
+              <div className="w-full relative">
+                {/* Hero Podium Ambient Emerald Glow — Strongest focal spotlight */}
+                <div 
+                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(650px,95%)] h-[400px] bg-emerald-500/25 rounded-full blur-[110px] z-0" 
+                  aria-hidden="true" 
+                />
+
+                <div className="relative z-10">
+                  {podiumItems.length === 0 ? (
+                    <div className="text-center py-16 bg-neutral-900/20 border border-neutral-900 rounded-3xl">
+                      <Recycle className="w-12 h-12 text-neutral-700 mx-auto mb-4 animate-spin" />
+                      <p className="text-neutral-400">No entries recorded yet.</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Podium (Ranks 2, 1, 3) — same layout on all screen sizes */}
+                      <div className="grid grid-cols-3 gap-1.5 sm:gap-4 md:gap-6 items-end pt-8 sm:pt-10 md:pt-12 pb-2 min-w-0">
                       
                       {/* 2nd Place */}
                       {podiumItems[1] && (
@@ -696,6 +733,7 @@ export default function EWasteDrive2026() {
                     </div>
                   </>
                 )}
+                </div>
               </div>
 
               {/* RANKED LIST (Positions 4–10) */}
@@ -782,7 +820,14 @@ export default function EWasteDrive2026() {
             </div>
 
             {/* RIGHT COLUMN: ANALYTICS PANEL (35% = lg:col-span-4) */}
-            <div className="lg:col-span-4 space-y-6 min-w-0">
+            <div className="lg:col-span-4 space-y-6 min-w-0 relative">
+              {/* Analytics Panel Medium Glow — Secondary focal glow */}
+              <div 
+                className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 w-[min(450px,95%)] h-[400px] bg-emerald-500/15 rounded-full blur-[100px] z-0" 
+                aria-hidden="true" 
+              />
+              
+              <div className="relative z-10 space-y-6">
               
               {/* Analytics Panel Header */}
               <div className="flex items-center gap-2 px-1">
@@ -931,7 +976,6 @@ export default function EWasteDrive2026() {
                           contentStyle={CHART_TOOLTIP_CONTENT_STYLE}
                           labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                           itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                          formatter={(value) => [`${value} kg`, "Collected"]}
                         />
                       </LineChart>
                     </ResponsiveContainer>
@@ -940,7 +984,7 @@ export default function EWasteDrive2026() {
                   )}
                 </div>
               </Card>
-
+            </div>
             </div>
           </div>
         </div>
