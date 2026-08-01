@@ -36,6 +36,8 @@ import { api } from "@/convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { galleryImages } from "@/lib/gallery";
+import ImagesScrollingGallery from "@/components/ui/images-scrolling-gallery";
 
 // ==========================================
 // CONFIGURATION & DUMMY DATA FOR LOCALHOST
@@ -991,7 +993,7 @@ export default function EWasteDrive2026() {
       </section>
 
       {/* Gallery Section */}
-      <ParallaxGallery />
+      <ImagesScrollingGallery images={galleryImages} />
     </div>
   );
 }

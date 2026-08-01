@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import NewsBanner from "@/components/NewsBanner";
 import { Newsletter } from "@/components/Newsletter";
+import EWasteImpactModal from "@/components/EWasteImpactModal";
 
 function AnimatedHeader() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -411,6 +412,9 @@ export default function Home() {
 
   return (
     <div className="bg-black">
+      {/* E-Waste Impact Modal */}
+      <EWasteImpactModal />
+
       {/* News Banner */}
       <NewsBanner
         newsUrl="https://www.thehindu.com/news/cities/mumbai/mumbai-college-students-collect-2-tonnes-of-e-waste-spread-awareness-among-schools/article69885016.ece"
