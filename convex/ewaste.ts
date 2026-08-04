@@ -1,6 +1,149 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+// Add or update a donor from the protected admin page.
+// If the email or phone already exists, the new weight is added to the
+// existing total and the waste-type list is merged.
+export const addAdminDonor = mutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    phone: v.string(),
+    participantType: v.union(
+        v.literal("individual"),
+        v.literal("organization")
+    ),
+    organizationName: v.optional(v.string()),
+    representativeName: v.optional(v.string()),
+    wasteWeight: v.number(),
+    wasteTypes: v.array(v.string()),
+    submittedAt: v.number(),
+    verificationStatus: v.union(
+        v.literal("pending"),
+        v.literal("verified"),
+        v.literal("rejected")
+    ),
+    verifiedBy: v.optional(v.string()),
+  },
+
+  handler: async (ctx, args) => {
+    const name = args.name.trim();
+    const email = args.email.trim().toLowerCase();
+    const phone = args.phone.trim();
+    const organizationName = args.organizationName?.trim();
+
+    if (!name || !email || !phone) {
+      throw new Error("Name, email and phone are required.");
+    }
+
+    if (!Number.isFinite(args.wasteWeight) || args.wasteWeight <= 0) {
+      throw new Error("Waste weight must be greater than 0 kg.");
+    }
+
+    if (args.wasteTypes.length === 0) {
+      throw new Error("At least one waste type is required.");
+    }
+
+    if (!Number.isFinite(args.submittedAt)) {
+      throw new Error("A valid submission time is required.");
+    }
+
+    if (
+        args.participantType === "organization" &&
+        !organizationName
+    ) {
+      throw new Error(
+          "Organization name is required for organization entries."
+      );
+    }
+
+    const existingByEmail = await ctx.db
+        .query("ewasteSubmissions")
+        .withIndex("by_email", (query) => query.eq("email", email))
+        .first();
+
+    const existingByPhone = await ctx.db
+        .query("ewasteSubmissions")
+        .withIndex("by_phone", (query) => query.eq("phone", phone))
+        .first();
+
+    const existingSubmission =
+        existingByEmail ?? existingByPhone;
+
+    const verificationFields =
+        args.verificationStatus === "verified"
+            ? {
+              verificationStatus: "verified" as const,
+              verifiedBy: args.verifiedBy ?? "Admin",
+              verifiedAt: Date.now(),
+            }
+            : {
+              verificationStatus: args.verificationStatus,
+              verifiedBy: undefined,
+              verifiedAt: undefined,
+            };
+
+    if (existingSubmission) {
+      const mergedWasteTypes = Array.from(
+          new Set([
+            ...existingSubmission.wasteTypes,
+            ...args.wasteTypes,
+          ])
+      );
+
+      await ctx.db.patch(existingSubmission._id, {
+        name,
+        email,
+        phone,
+        participantType: args.participantType,
+        organizationName:
+            args.participantType === "organization"
+                ? organizationName
+                : undefined,
+        representativeName:
+            args.participantType === "organization"
+                ? args.representativeName?.trim() || name
+                : undefined,
+        wasteWeight:
+            existingSubmission.wasteWeight + args.wasteWeight,
+        wasteTypes: mergedWasteTypes,
+        submittedAt: args.submittedAt,
+        ...verificationFields,
+      });
+
+      return {
+        id: existingSubmission._id,
+        action: "updated" as const,
+      };
+    }
+
+    const id = await ctx.db.insert("ewasteSubmissions", {
+      name,
+      email,
+      phone,
+      participantType: args.participantType,
+      organizationName:
+          args.participantType === "organization"
+              ? organizationName
+              : undefined,
+      representativeName:
+          args.participantType === "organization"
+              ? args.representativeName?.trim() || name
+              : undefined,
+      wasteWeight: args.wasteWeight,
+      wasteTypes: Array.from(new Set(args.wasteTypes)),
+      submittedAt: args.submittedAt,
+      ...verificationFields,
+    });
+
+    return {
+      id,
+      action: "created" as const,
+    };
+  },
+});
+
+
 // Submit e-waste entry
 export const submitEwaste = mutation({
   args: {
@@ -8,8 +151,8 @@ export const submitEwaste = mutation({
     email: v.string(),
     phone: v.string(),
     participantType: v.union(
-      v.literal("individual"),
-      v.literal("organization")
+        v.literal("individual"),
+        v.literal("organization")
     ),
     organizationName: v.optional(v.string()),
     organizationAddress: v.optional(v.string()),
@@ -21,14 +164,14 @@ export const submitEwaste = mutation({
   handler: async (ctx, args) => {
     // Check if user already submitted (by email or phone)
     const existingByEmail = await ctx.db
-      .query("ewasteSubmissions")
-      .withIndex("by_email", (q) => q.eq("email", args.email))
-      .first();
+        .query("ewasteSubmissions")
+        .withIndex("by_email", (q) => q.eq("email", args.email))
+        .first();
 
     const existingByPhone = await ctx.db
-      .query("ewasteSubmissions")
-      .withIndex("by_phone", (q) => q.eq("phone", args.phone))
-      .first();
+        .query("ewasteSubmissions")
+        .withIndex("by_phone", (q) => q.eq("phone", args.phone))
+        .first();
 
     const existingSubmission = existingByEmail || existingByPhone;
 
@@ -85,9 +228,9 @@ export const updateVerificationStatus = mutation({
   args: {
     submissionId: v.id("ewasteSubmissions"),
     status: v.union(
-      v.literal("pending"),
-      v.literal("verified"),
-      v.literal("rejected")
+        v.literal("pending"),
+        v.literal("verified"),
+        v.literal("rejected")
     ),
     verifiedBy: v.optional(v.string()),
   },
@@ -107,10 +250,10 @@ export const getAllSubmissions = query({
     const limit = args.limit || 1000;
 
     const submissions = await ctx.db
-      .query("ewasteSubmissions")
-      .withIndex("by_submitted")
-      .order("desc")
-      .take(limit);
+        .query("ewasteSubmissions")
+        .withIndex("by_submitted")
+        .order("desc")
+        .take(limit);
 
     return submissions.map((submission) => ({
       _id: submission._id,
@@ -140,15 +283,15 @@ export const getIndividualLeaderboard = query({
     const limit = args.limit || 100;
 
     const individuals = await ctx.db
-      .query("ewasteSubmissions")
-      .withIndex("by_type", (q) => q.eq("participantType", "individual"))
-      .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
-      .collect();
+        .query("ewasteSubmissions")
+        .withIndex("by_type", (q) => q.eq("participantType", "individual"))
+        .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
+        .collect();
 
     // Sort by waste weight descending
     const sorted = individuals
-      .sort((a, b) => b.wasteWeight - a.wasteWeight)
-      .slice(0, limit);
+        .sort((a, b) => b.wasteWeight - a.wasteWeight)
+        .slice(0, limit);
 
     return sorted.map((entry, index) => ({
       rank: index + 1,
@@ -168,21 +311,21 @@ export const getOrganizationLeaderboard = query({
     const limit = args.limit || 100;
 
     const organizations = await ctx.db
-      .query("ewasteSubmissions")
-      .withIndex("by_type", (q) => q.eq("participantType", "organization"))
-      .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
-      .collect();
+        .query("ewasteSubmissions")
+        .withIndex("by_type", (q) => q.eq("participantType", "organization"))
+        .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
+        .collect();
 
     // Group by organization and sum weights
     const orgMap = new Map<
-      string,
-      {
-        organizationName: string;
-        totalWeight: number;
-        entries: number;
-        representativeName: string;
-        lastSubmission: number;
-      }
+        string,
+        {
+          organizationName: string;
+          totalWeight: number;
+          entries: number;
+          representativeName: string;
+          lastSubmission: number;
+        }
     >();
 
     organizations.forEach((entry) => {
@@ -192,8 +335,8 @@ export const getOrganizationLeaderboard = query({
         existing.totalWeight += entry.wasteWeight;
         existing.entries += 1;
         existing.lastSubmission = Math.max(
-          existing.lastSubmission,
-          entry.submittedAt
+            existing.lastSubmission,
+            entry.submittedAt
         );
       } else {
         orgMap.set(orgName, {
@@ -208,8 +351,8 @@ export const getOrganizationLeaderboard = query({
 
     // Convert to array and sort by total weight
     const sorted = Array.from(orgMap.values())
-      .sort((a, b) => b.totalWeight - a.totalWeight)
-      .slice(0, limit);
+        .sort((a, b) => b.totalWeight - a.totalWeight)
+        .slice(0, limit);
 
     return sorted.map((org, index) => ({
       rank: index + 1,
@@ -226,37 +369,37 @@ export const getOrganizationLeaderboard = query({
 export const getTopFive = query({
   handler: async (ctx) => {
     const individuals = await ctx.db
-      .query("ewasteSubmissions")
-      .withIndex("by_type", (q) => q.eq("participantType", "individual"))
-      .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
-      .collect();
+        .query("ewasteSubmissions")
+        .withIndex("by_type", (q) => q.eq("participantType", "individual"))
+        .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
+        .collect();
 
     const organizations = await ctx.db
-      .query("ewasteSubmissions")
-      .withIndex("by_type", (q) => q.eq("participantType", "organization"))
-      .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
-      .collect();
+        .query("ewasteSubmissions")
+        .withIndex("by_type", (q) => q.eq("participantType", "organization"))
+        .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
+        .collect();
 
     // Sort individuals
     const topIndividuals = individuals
-      .sort((a, b) => b.wasteWeight - a.wasteWeight)
-      .slice(0, 5)
-      .map((entry, index) => ({
-        rank: index + 1,
-        name: entry.name,
-        wasteWeight: entry.wasteWeight,
-        submittedAt: entry.submittedAt,
-      }));
+        .sort((a, b) => b.wasteWeight - a.wasteWeight)
+        .slice(0, 5)
+        .map((entry, index) => ({
+          rank: index + 1,
+          name: entry.name,
+          wasteWeight: entry.wasteWeight,
+          submittedAt: entry.submittedAt,
+        }));
 
     // Group and sort organizations
     const orgMap = new Map<
-      string,
-      {
-        organizationName: string;
-        totalWeight: number;
-        representativeName: string;
-        lastSubmission: number;
-      }
+        string,
+        {
+          organizationName: string;
+          totalWeight: number;
+          representativeName: string;
+          lastSubmission: number;
+        }
     >();
 
     organizations.forEach((entry) => {
@@ -265,8 +408,8 @@ export const getTopFive = query({
         const existing = orgMap.get(orgName)!;
         existing.totalWeight += entry.wasteWeight;
         existing.lastSubmission = Math.max(
-          existing.lastSubmission,
-          entry.submittedAt
+            existing.lastSubmission,
+            entry.submittedAt
         );
       } else {
         orgMap.set(orgName, {
@@ -279,15 +422,15 @@ export const getTopFive = query({
     });
 
     const topOrganizations = Array.from(orgMap.values())
-      .sort((a, b) => b.totalWeight - a.totalWeight)
-      .slice(0, 5)
-      .map((org, index) => ({
-        rank: index + 1,
-        organizationName: org.organizationName,
-        representativeName: org.representativeName,
-        totalWeight: org.totalWeight,
-        lastSubmission: org.lastSubmission,
-      }));
+        .sort((a, b) => b.totalWeight - a.totalWeight)
+        .slice(0, 5)
+        .map((org, index) => ({
+          rank: index + 1,
+          organizationName: org.organizationName,
+          representativeName: org.representativeName,
+          totalWeight: org.totalWeight,
+          lastSubmission: org.lastSubmission,
+        }));
 
     return {
       individuals: topIndividuals,
@@ -300,21 +443,21 @@ export const getTopFive = query({
 export const getEwasteStats = query({
   handler: async (ctx) => {
     const allSubmissions = await ctx.db
-      .query("ewasteSubmissions")
-      .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
-      .collect();
+        .query("ewasteSubmissions")
+        .filter((q) => q.eq(q.field("verificationStatus"), "verified"))
+        .collect();
 
     const totalWeight = allSubmissions.reduce(
-      (sum, entry) => sum + entry.wasteWeight,
-      0
+        (sum, entry) => sum + entry.wasteWeight,
+        0
     );
     const individualCount = allSubmissions.filter(
-      (s) => s.participantType === "individual"
+        (s) => s.participantType === "individual"
     ).length;
     const organizationCount = new Set(
-      allSubmissions
-        .filter((s) => s.participantType === "organization")
-        .map((s) => s.organizationName)
+        allSubmissions
+            .filter((s) => s.participantType === "organization")
+            .map((s) => s.organizationName)
     ).size;
 
     return {
