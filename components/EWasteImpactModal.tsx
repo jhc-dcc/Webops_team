@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
@@ -13,7 +13,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Recycle, Users, Building, Trophy, TrendingUp, Sparkles, ArrowRight } from "lucide-react";
+import { Recycle, Users, Building, Trophy, TrendingUp, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // CountUp Helper for animated numbers
@@ -94,8 +94,23 @@ export default function EWasteImpactModal() {
 
   // Check LocalStorage & Trigger 2s Delay
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Expose reset helper on window object for testing / manual reset
+      (window as any).resetEWasteModal = () => {
+        localStorage.removeItem("dcc_ewaste_modal_dont_show");
+        localStorage.removeItem("dcc_ewaste_modal_seen");
+        sessionStorage.removeItem("dcc_ewaste_modal_seen");
+        console.log("EWasteImpactModal state reset!");
+        window.location.reload();
+      };
+
+      // Reset the don't show again & old seen keys from localStorage as requested
+      localStorage.removeItem("dcc_ewaste_modal_dont_show");
+      localStorage.removeItem("dcc_ewaste_modal_seen");
+    }
+
     const isDismissed = localStorage.getItem("dcc_ewaste_modal_dont_show") === "true";
-    const hasBeenSeen = localStorage.getItem("dcc_ewaste_modal_seen") === "true";
+    const hasBeenSeen = sessionStorage.getItem("dcc_ewaste_modal_seen") === "true";
 
     if (isDismissed || hasBeenSeen) {
       return;
@@ -103,11 +118,23 @@ export default function EWasteImpactModal() {
 
     const timer = setTimeout(() => {
       setOpen(true);
-      localStorage.setItem("dcc_ewaste_modal_seen", "true");
+      sessionStorage.setItem("dcc_ewaste_modal_seen", "true");
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Lock body scroll when open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   const handleDontShowChange = (checked: boolean) => {
     setDontShowAgain(checked);
@@ -128,111 +155,125 @@ export default function EWasteImpactModal() {
 
   // Variants for Framer Motion
   const containerVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.92, y: 15 },
+    hidden: { opacity: 0, scale: 0.95, y: 10 },
     visible: {
       opacity: 1,
       scale: 1,
       y: 0,
       transition: {
-        duration: 0.45,
-        ease: "easeOut",
-        staggerChildren: 0.08,
+        duration: 0.35,
+        ease: [0.16, 1, 0.3, 1],
+        staggerChildren: 0.05,
       },
     },
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 14 },
+    hidden: { opacity: 0, y: 10 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.4, ease: "easeOut" },
+      transition: { duration: 0.3, ease: "easeOut" },
     },
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className={cn(
-        "sm:max-w-lg max-w-[92vw] p-6 sm:p-8 rounded-[32px]",
-        "bg-neutral-950/95 border border-emerald-500/30",
-        "shadow-[0_0_60px_rgba(16,185,129,0.18)] backdrop-blur-2xl",
-        "text-white overflow-hidden max-h-[90vh] flex flex-col justify-between focus:outline-none"
-      )}>
+      <DialogContent
+        className={cn(
+          "sm:max-w-[540px] max-w-[92vw] p-5 sm:p-7 rounded-[32px]",
+          "bg-black/85 backdrop-blur-2xl border border-white/15",
+          "shadow-[0_0_80px_rgba(0,0,0,0.95)] text-white focus:outline-none",
+          "max-h-[85vh] flex flex-col justify-between overflow-hidden z-[100000]"
+        )}
+      >
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-5 overflow-y-auto pr-1 custom-scrollbar"
+          className="space-y-4 sm:space-y-5 overflow-y-auto pr-1 custom-scrollbar"
         >
-          {/* Header */}
-          <DialogHeader className="text-center sm:text-center space-y-2">
+          {/* Compact Header */}
+          <DialogHeader className="text-center sm:text-center space-y-1.5 pt-0">
             <motion.div variants={itemVariants} className="flex justify-center">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <Recycle className="w-3.5 h-3.5 animate-spin-slow" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium tracking-wide bg-white/5 text-neutral-300 border border-white/10">
+                <Recycle className="w-3 h-3 text-emerald-400 animate-spin-slow" />
                 E-Waste Collection Drive
               </span>
             </motion.div>
 
             <DialogTitle asChild>
-              <motion.h2 variants={itemVariants} className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              <motion.h2
+                variants={itemVariants}
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight"
+              >
                 Our Environmental Impact 🌍
               </motion.h2>
             </DialogTitle>
 
             <DialogDescription asChild>
-              <motion.p variants={itemVariants} className="text-xs sm:text-sm text-neutral-400 max-w-sm mx-auto">
-                Join our mission to build a greener and cleaner community through responsible recycling.
+              <motion.p
+                variants={itemVariants}
+                className="text-xs sm:text-sm text-neutral-400 max-w-sm mx-auto leading-normal font-normal"
+              >
+                Join our mission to build a cleaner community through responsible recycling.
               </motion.p>
             </DialogDescription>
           </DialogHeader>
 
-          {/* Stats Cards (3 Cards Grid) */}
-          <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2.5 sm:gap-3">
-            {/* Card 1: Individuals */}
-            <div className="bg-neutral-900/60 border border-neutral-800/90 hover:border-emerald-500/30 rounded-2xl p-2.5 sm:p-3 text-center transition-all duration-300 group shadow-md">
-              <div className="flex justify-center mb-1.5 text-emerald-400">
-                <Users className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          {/* Compact Key Impact Stats Section */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-white/[0.03] border border-white/10 rounded-2xl p-3.5 sm:p-4"
+          >
+            {/* Primary Focus: Total Collected Hero Metric */}
+            <div className="text-center pb-2.5 mb-2.5 border-b border-white/10">
+              <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-neutral-400 tracking-wider uppercase mb-0.5">
+                <Recycle className="w-3 h-3 text-emerald-400" />
+                <span>Total Collected</span>
               </div>
-              <p className="text-[10px] sm:text-xs text-neutral-400 font-medium">Individuals</p>
-              <p className="text-base sm:text-lg font-bold text-neutral-100 mt-0.5">
-                <CountUp end={stats.individualCount} />
-              </p>
-            </div>
-
-            {/* Card 2: Organizations */}
-            <div className="bg-neutral-900/60 border border-neutral-800/90 hover:border-emerald-500/30 rounded-2xl p-2.5 sm:p-3 text-center transition-all duration-300 group shadow-md">
-              <div className="flex justify-center mb-1.5 text-emerald-400">
-                <Building className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              </div>
-              <p className="text-[10px] sm:text-xs text-neutral-400 font-medium">Organizations</p>
-              <p className="text-base sm:text-lg font-bold text-neutral-100 mt-0.5">
-                <CountUp end={stats.organizationCount} />
-              </p>
-            </div>
-
-            {/* Card 3: Total Collected */}
-            <div className="bg-gradient-to-b from-emerald-950/40 to-neutral-900/60 border border-emerald-500/30 hover:border-emerald-500/50 rounded-2xl p-2.5 sm:p-3 text-center transition-all duration-300 group shadow-md">
-              <div className="flex justify-center mb-1.5 text-emerald-400">
-                <Recycle className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              </div>
-              <p className="text-[10px] sm:text-xs text-neutral-400 font-medium">Total Collected</p>
-              <p className="text-base sm:text-lg font-bold text-emerald-400 mt-0.5">
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 tracking-tight">
                 <CountUp end={stats.totalWeight} suffix=" kg" />
-              </p>
+              </div>
+            </div>
+
+            {/* Sub Stats: Individuals & Organizations */}
+            <div className="grid grid-cols-2 divide-x divide-white/10 text-center">
+              <div className="px-2">
+                <div className="flex items-center justify-center gap-1 text-[11px] text-neutral-400 font-medium mb-0.5">
+                  <Users className="w-3 h-3 text-neutral-400" />
+                  <span>Individuals</span>
+                </div>
+                <p className="text-lg sm:text-xl font-bold text-neutral-100">
+                  <CountUp end={stats.individualCount} />
+                </p>
+              </div>
+
+              <div className="px-2">
+                <div className="flex items-center justify-center gap-1 text-[11px] text-neutral-400 font-medium mb-0.5">
+                  <Building className="w-3 h-3 text-neutral-400" />
+                  <span>Organizations</span>
+                </div>
+                <p className="text-lg sm:text-xl font-bold text-neutral-100">
+                  <CountUp end={stats.organizationCount} />
+                </p>
+              </div>
             </div>
           </motion.div>
 
-          {/* Leaderboard Section */}
-          <motion.div variants={itemVariants} className="bg-neutral-900/40 border border-neutral-800/80 rounded-2xl p-3.5 sm:p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-200">
-                <Trophy className="w-4 h-4 text-amber-400" />
+          {/* Compact Top 3 Contributors Leaderboard Section */}
+          <motion.div variants={itemVariants} className="space-y-2.5">
+            <div className="flex items-center justify-between px-0.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-300">
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
                 <span>Top 3 Individual Contributors</span>
               </div>
-              <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full">Drive &apos;26</span>
+              <span className="text-[10px] text-neutral-400 font-medium bg-white/5 border border-white/10 px-2 py-0.5 rounded-full">
+                Drive &apos;26
+              </span>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 pt-0.5">
               {topContributors.map((user, idx) => {
                 const relativeWidth = Math.max((user.wasteWeight / maxContributorWeight) * 100, 15);
                 const initials = user.name
@@ -245,28 +286,33 @@ export default function EWasteImpactModal() {
                 return (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 + idx * 0.1, duration: 0.3 }}
-                    className="space-y-1"
+                    transition={{ delay: 0.12 + idx * 0.06, duration: 0.25 }}
+                    className="space-y-1.5"
                   >
-                    <div className="flex items-center justify-between text-xs">
+                    {/* Top Row: Medal + Avatar + Name | Weight */}
+                    <div className="flex items-center justify-between text-xs sm:text-sm flex-nowrap">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-sm">{user.medal}</span>
-                        <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-[10px] font-bold text-emerald-300">
+                        <span className="text-sm leading-none">{user.medal}</span>
+                        <div className="w-6 h-6 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-[10px] font-bold text-neutral-200 shrink-0">
                           {initials}
                         </div>
-                        <span className="font-semibold text-neutral-200 truncate max-w-[140px] sm:max-w-[180px]">{user.name}</span>
+                        <span className="font-semibold text-neutral-200 text-xs sm:text-sm truncate whitespace-nowrap">
+                          {user.name}
+                        </span>
                       </div>
-                      <span className="font-bold text-emerald-400">{user.wasteWeight} kg</span>
+                      <span className="font-bold text-emerald-400 text-xs sm:text-sm shrink-0 ml-2 whitespace-nowrap">
+                        {user.wasteWeight} kg
+                      </span>
                     </div>
 
-                    {/* Progress Bar relative to #1 */}
-                    <div className="h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
+                    {/* Progress Bar below row */}
+                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${relativeWidth}%` }}
-                        transition={{ duration: 0.8, delay: 0.3 + idx * 0.1, ease: "easeOut" }}
+                        transition={{ duration: 0.7, delay: 0.2 + idx * 0.08, ease: "easeOut" }}
                         className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
                       />
                     </div>
@@ -276,49 +322,60 @@ export default function EWasteImpactModal() {
             </div>
           </motion.div>
 
-          {/* Collection Progress Section */}
-          <motion.div variants={itemVariants} className="bg-neutral-900/40 border border-neutral-800/80 rounded-2xl p-3.5 sm:p-4 space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-neutral-200">
-              <div className="flex items-center gap-1.5">
-                <TrendingUp className="w-4 h-4 text-emerald-400" />
-                <span>Collection Progress</span>
+          {/* Compact Collection Progress Section */}
+          <motion.div variants={itemVariants} className="space-y-2">
+            <div className="flex items-center justify-between px-0.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-300">
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Collection Goal</span>
               </div>
-              <span className="text-emerald-400 font-extrabold">{progressPercentage.toFixed(1)}%</span>
+              <span className="text-sm font-extrabold text-emerald-400">
+                {progressPercentage.toFixed(1)}%
+              </span>
             </div>
 
-            {/* Main Animated Progress Bar */}
-            <div className="h-2.5 w-full bg-neutral-800 rounded-full overflow-hidden p-0.5 border border-neutral-700/50">
+            {/* Compact Progress Bar */}
+            <div className="h-2.5 w-full bg-white/10 rounded-full overflow-hidden p-0.5 border border-white/10">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercentage}%` }}
-                transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 rounded-full shadow-[0_0_12px_rgba(16,185,129,0.5)]"
+                transition={{ duration: 1.0, delay: 0.3, ease: "easeOut" }}
+                className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.4)]"
               />
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-neutral-400 pt-0.5">
-              <span>Collected: <strong className="text-neutral-200">{stats.totalWeight.toLocaleString()} kg</strong></span>
-              <span>Goal: <strong className="text-neutral-200">{TARGET_GOAL_KG.toLocaleString()} kg</strong></span>
+            <div className="flex items-center justify-between text-[11px] sm:text-xs text-neutral-400 px-0.5">
+              <span>
+                Collected: <strong className="text-neutral-200 font-semibold">{stats.totalWeight.toLocaleString()} kg</strong>
+              </span>
+              <span>
+                Goal: <strong className="text-neutral-200 font-semibold">{TARGET_GOAL_KG.toLocaleString()} kg</strong>
+              </span>
             </div>
           </motion.div>
 
-          {/* Footer Note */}
-          <motion.p variants={itemVariants} className="text-center text-[11px] sm:text-xs text-neutral-400 flex items-center justify-center gap-1 pt-1">
+          {/* Footer Helper Note */}
+          <motion.p
+            variants={itemVariants}
+            className="text-center text-[11px] text-neutral-400 flex items-center justify-center gap-1 pt-0.5"
+          >
             🌱 Every device recycled helps build a cleaner and greener future.
           </motion.p>
 
-          {/* CTA & Checkbox Container */}
-          <motion.div variants={itemVariants} className="space-y-3 pt-2">
+          {/* Compact CTA & Checkbox Container */}
+          <motion.div variants={itemVariants} className="space-y-2.5 pt-1">
             <button
               onClick={handleExplore}
               className={cn(
-                "w-full py-3 px-6 rounded-full font-bold text-sm text-white",
-                "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500",
-                "shadow-lg shadow-emerald-600/30 hover:shadow-emerald-500/40",
-                "transition-all duration-300 flex items-center justify-center gap-2 group"
+                "w-full py-3 sm:py-3.5 px-6 rounded-full font-bold text-sm sm:text-base text-white",
+                "bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500",
+                "hover:from-emerald-500 hover:to-teal-400",
+                "shadow-[0_4px_20px_rgba(16,185,129,0.35)] hover:shadow-[0_6px_25px_rgba(16,185,129,0.5)]",
+                "hover:scale-[1.01] active:scale-[0.99]",
+                "transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer"
               )}
             >
-              <span>♻ Explore E-Waste Drive</span>
+              <span>Explore E-Waste Drive</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
 
@@ -330,7 +387,10 @@ export default function EWasteImpactModal() {
                 onCheckedChange={(checked) => handleDontShowChange(Boolean(checked))}
                 className="border-neutral-600 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
               />
-              <label htmlFor="dont-show" className="cursor-pointer select-none text-[11px] text-neutral-400 hover:text-neutral-300">
+              <label
+                htmlFor="dont-show"
+                className="cursor-pointer select-none text-[11px] sm:text-xs text-neutral-400 hover:text-neutral-300 transition-colors"
+              >
                 Don&apos;t show this again
               </label>
             </div>

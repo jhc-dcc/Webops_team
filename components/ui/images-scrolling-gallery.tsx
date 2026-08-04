@@ -28,97 +28,84 @@ function GalleryCard({
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
+  // Measure scroll progress relative to non-sticky outer wrapper
   const { scrollYProgress } = useScroll({
     target: cardRef,
     offset: ["start end", "end start"],
   });
 
-  const exitScale = isMobile ? 0.92 : 0.82;
-  const exitY = isMobile ? -6 : -14;
+  const exitScale = isMobile ? 0.94 : 0.86;
+  const exitY = isMobile ? -8 : -16;
 
   const scale = useTransform(
     scrollYProgress,
-    [0, 0.45, 0.65, 1],
-    [0.95, 1, 1, exitScale]
+    [0, 0.4, 0.7, 1],
+    [0.96, 1, 1, exitScale]
   );
 
   const opacity = useTransform(
     scrollYProgress,
-    [0, 0.3, 0.65, 1],
-    [0, 1, 1, 0.75]
-  );
-
-  const blur = useTransform(
-    scrollYProgress,
-    [0, 0.45, 0.65, 1],
-    ["blur(8px)", "blur(0px)", "blur(0px)", "blur(2px)"]
+    [0, 0.25, 0.7, 1],
+    [0.2, 1, 1, 0.85]
   );
 
   const translateY = useTransform(
     scrollYProgress,
-    [0, 0.45, 0.65, 1],
-    [40, 0, 0, exitY]
+    [0, 0.4, 0.7, 1],
+    [30, 0, 0, exitY]
   );
 
   // Fixed top offset + small incremental offset for stacked deck effect
   const stickyTop = isMobile ? 80 + index * 12 : 100 + index * 20;
 
   return (
-    <div
-      ref={cardRef}
-      className="sticky mb-12 sm:mb-16 md:mb-20 last:mb-0 transform-gpu"
-      style={{ top: `${stickyTop}px` }}
-    >
-      <motion.div
-        style={{
-          scale,
-          opacity,
-          filter: blur,
-          y: translateY,
-        }}
-        whileHover={
-          !isMobile
-            ? {
-                scale: 1.02,
-                filter: "brightness(1.05)",
-                transition: { duration: 0.3, ease: "easeOut" },
-              }
-            : undefined
-        }
-        className={cn(
-          "relative w-full overflow-hidden rounded-[24px] sm:rounded-[32px]",
-          "bg-neutral-900 border border-neutral-800/80",
-          "shadow-2xl shadow-black/80 transition-shadow duration-300",
-          "[@media(hover:hover)]:hover:shadow-emerald-500/10 [@media(hover:hover)]:hover:border-emerald-500/30"
-        )}
+    <div ref={cardRef} className="relative mb-12 sm:mb-16 md:mb-20 last:mb-0">
+      <div
+        className="sticky transform-gpu"
+        style={{ top: `${stickyTop}px` }}
       >
-        <div className="relative aspect-video w-full overflow-hidden">
-          <Image
-            src={image.image}
-            alt={image.title}
-            fill
-            priority={index === 0}
-            sizes="(max-width: 768px) 95vw, (max-width: 1200px) 90vw, 1100px"
-            className="object-cover transition-transform duration-700 hover:scale-105"
-          />
+        <motion.div
+          style={{
+            scale,
+            opacity,
+            y: translateY,
+          }}
+          className={cn(
+            "relative w-full overflow-hidden rounded-[24px] sm:rounded-[32px]",
+            "bg-neutral-900 border border-neutral-800/80",
+            "shadow-2xl shadow-black/80 transition-all duration-300",
+            "[@media(hover:hover)]:hover:border-emerald-500/40"
+          )}
+        >
+          <div className="relative aspect-video w-full overflow-hidden bg-neutral-950">
+            <Image
+              src={image.image}
+              alt={image.title}
+              fill
+              priority={index === 0}
+              unoptimized
+              sizes="(max-width: 768px) 95vw, (max-width: 1200px) 90vw, 1100px"
+              className="object-cover transition-transform duration-700 hover:scale-105"
+            />
 
-          {/* Premium Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+            {/* Premium Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
 
-          {/* Badge & Title Content */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 flex flex-col justify-end">
-            <div className="flex items-center gap-2 mb-2 sm:mb-3">
-              <span className="px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold tracking-wider uppercase bg-emerald-500/10 text-emerald-400 backdrop-blur-md border border-emerald-500/20">
-                Drive #{index + 1}
-              </span>
+            {/* Badge & Title Content */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 flex flex-col justify-end pointer-events-none">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <span className="px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold tracking-wider uppercase bg-emerald-950/80 text-emerald-400 border border-emerald-500/30">
+                  Drive #{index + 1}
+                </span>
+              </div>
+
+              <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md">
+                {image.title}
+              </h3>
             </div>
-
-            <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md">
-              {image.title}
-            </h3>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 }
