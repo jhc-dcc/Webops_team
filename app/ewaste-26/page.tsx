@@ -36,10 +36,14 @@ import { api } from "@/convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { galleryImages } from "@/lib/gallery";
+import ImagesScrollingGallery from "@/components/ui/images-scrolling-gallery";
 
 // ==========================================
 // CHART CONFIGURATION
 // ==========================================
+const USE_MOCK_DATA = false; // Set to true to use mock data for local testing
+
 const CHART_TOOLTIP_CONTENT_STYLE = {
   background: "#0a0a0a",
   borderColor: "#1f1f1f",
@@ -1015,8 +1019,8 @@ export default function EWasteDrive2026() {
           </div>
         </section>
 
-        {/* Gallery Section */}
-        <ParallaxGallery />
-      </div>
+      {/* Gallery Section */}
+      <ImagesScrollingGallery images={galleryImages} />
+    </div>
   );
 }

@@ -18,8 +18,15 @@ import type * as contact from "../contact.js";
 import type * as ewaste from "../ewaste.js";
 import type * as newsletter from "../newsletter.js";
 import type * as polls from "../polls.js";
+import type * as popups from "../popups.js";
 import type * as registration from "../registration.js";
 import type * as sonyRegistrations from "../sonyRegistrations.js";
+
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -35,14 +42,17 @@ declare const fullApi: ApiFromModules<{
   ewaste: typeof ewaste;
   newsletter: typeof newsletter;
   polls: typeof polls;
+  popups: typeof popups;
   registration: typeof registration;
   sonyRegistrations: typeof sonyRegistrations;
 }>;
+declare const fullApiWithMounts: typeof fullApi;
+
 export declare const api: FilterApi<
-  typeof fullApi,
+  typeof fullApiWithMounts,
   FunctionReference<any, "public">
 >;
 export declare const internal: FilterApi<
-  typeof fullApi,
+  typeof fullApiWithMounts,
   FunctionReference<any, "internal">
 >;
