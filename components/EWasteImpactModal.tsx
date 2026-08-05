@@ -63,25 +63,18 @@ export default function EWasteImpactModal() {
   const statsData = useQuery(api.ewaste.getEwasteStats);
   const topFiveData = useQuery(api.ewaste.getTopFive);
 
-  // Compute final stats with fallback
+  // Use real Convex data only — no fake fallbacks
   const stats = useMemo(() => {
-    if (statsData && statsData.totalWeight > 0) {
-      return {
-        totalWeight: statsData.totalWeight,
-        individualCount: statsData.individualCount,
-        organizationCount: statsData.organizationCount,
-      };
-    }
     return {
-      totalWeight: 2304.1,
-      individualCount: 13,
-      organizationCount: 6,
+      totalWeight: statsData?.totalWeight ?? 0,
+      individualCount: statsData?.individualCount ?? 0,
+      organizationCount: statsData?.organizationCount ?? 0,
     };
   }, [statsData]);
 
-  // Compute top 3 contributors with fallback
+  // Use real top contributors from Convex (show whatever exists, even if < 3)
   const topContributors = useMemo(() => {
-    if (topFiveData?.individuals && topFiveData.individuals.length >= 3) {
+    if (topFiveData?.individuals && topFiveData.individuals.length > 0) {
       return topFiveData.individuals.slice(0, 3).map((item, idx) => ({
         rank: idx + 1,
         name: item.name,
@@ -89,7 +82,7 @@ export default function EWasteImpactModal() {
         medal: idx === 0 ? "🥇" : idx === 1 ? "🥈" : "🥉",
       }));
     }
-    return DEFAULT_TOP_CONTRIBUTORS;
+    return [];
   }, [topFiveData]);
 
   // Check LocalStorage & Trigger 2s Delay
@@ -103,10 +96,6 @@ export default function EWasteImpactModal() {
         console.log("EWasteImpactModal state reset!");
         window.location.reload();
       };
-
-      // Reset the don't show again & old seen keys from localStorage as requested
-      localStorage.removeItem("dcc_ewaste_modal_dont_show");
-      localStorage.removeItem("dcc_ewaste_modal_seen");
     }
 
     const isDismissed = localStorage.getItem("dcc_ewaste_modal_dont_show") === "true";
@@ -116,12 +105,8 @@ export default function EWasteImpactModal() {
       return;
     }
 
-    const timer = setTimeout(() => {
-      setOpen(true);
-      sessionStorage.setItem("dcc_ewaste_modal_seen", "true");
-    }, 2000);
-
-    return () => clearTimeout(timer);
+    setOpen(true);
+    sessionStorage.setItem("dcc_ewaste_modal_seen", "true");
   }, []);
 
   // Lock body scroll when open

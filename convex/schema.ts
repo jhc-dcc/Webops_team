@@ -156,6 +156,17 @@ const applicationTables = {
     updatedAt: v.number(),
     updatedBy: v.optional(v.string()),
   }),
+
+  popups: defineTable({
+    title: v.string(),
+    description: v.string(),
+    newsUrl: v.string(),
+    badge: v.optional(v.string()),
+    isActive: v.boolean(),
+    autoHideDuration: v.optional(v.number()),
+    showOnlyOnce: v.optional(v.boolean()),
+    createdAt: v.optional(v.number()),
+  }).index("by_active", ["isActive"]),
 };
 
 export default defineSchema({

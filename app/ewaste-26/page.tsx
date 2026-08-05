@@ -42,7 +42,7 @@ import ImagesScrollingGallery from "@/components/ui/images-scrolling-gallery";
 // ==========================================
 // CONFIGURATION & DUMMY DATA FOR LOCALHOST
 // ==========================================
-const USE_MOCK_DATA = true; // Set to false to use Convex database queries
+const USE_MOCK_DATA = false; // Set to true to use mock data for local testing
 
 const CHART_TOOLTIP_CONTENT_STYLE = {
   background: "#0a0a0a",

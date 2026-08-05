@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { X, Newspaper, ExternalLink } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface NewsBannerProps {
   newsUrl?: string;
@@ -12,41 +14,47 @@ interface NewsBannerProps {
 }
 
 export default function NewsBanner({
-  newsUrl = "https://www.thehindu.com/news/cities/mumbai/mumbai-college-students-collect-2-tonnes-of-e-waste-spread-awareness-among-schools/article69885016.ece",
-  title = "DCC's E-Waste Drive featured in major news!",
-  description = "Read about our environmental impact and sustainability efforts.",
-  autoHideDuration,
+  newsUrl: defaultNewsUrl = "https://www.thehindu.com/news/cities/mumbai/mumbai-college-students-collect-2-tonnes-of-e-waste-spread-awareness-among-schools/article69885016.ece",
+  title: defaultTitle = "DCC's E-Waste Drive featured in major news!",
+  description: defaultDescription = "Read about our environmental impact and sustainability efforts.",
+  autoHideDuration: defaultAutoHideDuration,
   showOnlyOnce = true,
 }: NewsBannerProps) {
   const [showModal, setShowModal] = useState(false);
 
+  // Fetch active popup from Convex Database
+  const activePopup = useQuery(api.popups.getActivePopup);
+
+  // Determine final field values (Convex DB data prioritized, fallback to props/defaults)
+  const finalTitle = activePopup?.title || defaultTitle;
+  const finalDescription = activePopup?.description || defaultDescription;
+  const finalNewsUrl = activePopup?.newsUrl || defaultNewsUrl;
+  const finalBadge = activePopup?.badge || "📰 BREAKING NEWS";
+  const finalAutoHideDuration = activePopup?.autoHideDuration ?? defaultAutoHideDuration;
+
   useEffect(() => {
-    // Small delay to ensure page loads before showing popup
-    const timer = setTimeout(() => {
-      if (showOnlyOnce && typeof window !== 'undefined') {
-        const lastSeen = localStorage.getItem('newsBannerLastSeen');
-        const oneWeek = 7 * 24 * 60 * 60 * 1000;
-        
-        if (!lastSeen || Date.now() - parseInt(lastSeen) > oneWeek) {
-          setShowModal(true);
-        }
-      } else {
+    // Show immediately without artificial delay
+    if (showOnlyOnce && typeof window !== "undefined") {
+      const lastSeen = localStorage.getItem("newsBannerLastSeen");
+      const oneWeek = 7 * 24 * 60 * 60 * 1000;
+
+      if (!lastSeen || Date.now() - parseInt(lastSeen) > oneWeek) {
         setShowModal(true);
       }
-    }, 2000); // Show after 2 seconds
-
-    return () => clearTimeout(timer);
+    } else {
+      setShowModal(true);
+    }
   }, [showOnlyOnce]);
 
   useEffect(() => {
-    if (autoHideDuration && showModal) {
+    if (finalAutoHideDuration && showModal) {
       const timer = setTimeout(() => {
         handleCloseModal();
-      }, autoHideDuration);
+      }, finalAutoHideDuration);
 
       return () => clearTimeout(timer);
     }
-  }, [showModal, autoHideDuration]);
+  }, [showModal, finalAutoHideDuration]);
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -96,25 +104,25 @@ export default function NewsBanner({
             {/* News Badge */}
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm font-bold border border-red-500/30">
-                📰 BREAKING NEWS
+                {finalBadge}
               </span>
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             </div>
 
             {/* Title */}
             <h2 className="text-xl font-bold text-white text-center mb-3 leading-tight">
-              🎉 {title}
+              🎉 {finalTitle}
             </h2>
 
             {/* Description */}
             <p className="text-gray-300 text-center text-sm mb-6 leading-relaxed">
-              {description}
+              {finalDescription}
             </p>
 
             {/* Call to Action */}
             <div className="space-y-3">
               <a
-                href={newsUrl}
+                href={finalNewsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-red-500/25"
