@@ -509,113 +509,6 @@ export default function EWasteDrive2026() {
     return list.length > 10;
   }, [activeTab, individuals, organizations]);
 
-  // Calculate dynamic analytics data based on Convex submissions
-  const deviceData = useMemo(() => {
-    if (USE_MOCK_DATA || !individualsData) return MOCK_DEVICE_DATA;
-
-    const counts: Record<string, number> = {
-      Laptops: 0,
-      Mobiles: 0,
-      Monitors: 0,
-      "Cables/Chargers": 0,
-      Others: 0,
-    };
-
-    let totalCount = 0;
-    (individualsData || []).forEach((item) => {
-      (item.wasteTypes || []).forEach((type) => {
-        const lower = type.toLowerCase();
-        if (lower.includes("laptop")) counts["Laptops"] += 1;
-        else if (lower.includes("mobile") || lower.includes("phone")) counts["Mobiles"] += 1;
-        else if (lower.includes("monitor") || lower.includes("screen")) counts["Monitors"] += 1;
-        else if (lower.includes("cable") || lower.includes("charger")) counts["Cables/Chargers"] += 1;
-        else counts["Others"] += 1;
-        totalCount += 1;
-      });
-    });
-
-    if (totalCount === 0) {
-      return [
-        { name: "Laptops", value: 0, color: "#10B981" },
-        { name: "Mobiles", value: 0, color: "#059669" },
-        { name: "Monitors", value: 0, color: "#34D399" },
-        { name: "Cables/Chargers", value: 0, color: "#6EE7B7" },
-        { name: "Others", value: 0, color: "#A7F3D0" },
-      ];
-    }
-
-    const colors: Record<string, string> = {
-      Laptops: "#10B981",
-      Mobiles: "#059669",
-      Monitors: "#34D399",
-      "Cables/Chargers": "#6EE7B7",
-      Others: "#A7F3D0",
-    };
-
-    return Object.keys(counts).map((key) => ({
-      name: key,
-      value: Math.round((counts[key] / totalCount) * 100),
-      color: colors[key],
-    }));
-  }, [individualsData]);
-
-  const departmentData = useMemo(() => {
-    if (USE_MOCK_DATA || (!individualsData && !organizationsData)) return MOCK_DEPARTMENT_DATA;
-
-    const deptWeights: Record<string, number> = {};
-
-    (individualsData || []).forEach((item) => {
-      const dept = "Individuals";
-      deptWeights[dept] = (deptWeights[dept] || 0) + item.wasteWeight;
-    });
-
-    (organizationsData || []).forEach((org) => {
-      const dept = org.organizationName || "Organization";
-      deptWeights[dept] = (deptWeights[dept] || 0) + org.totalWeight;
-    });
-
-    const result = Object.entries(deptWeights).map(([name, weight]) => ({
-      name,
-      weight: Math.round(weight * 10) / 10,
-    }));
-
-    if (result.length === 0) {
-      return [{ name: "No Submissions", weight: 0 }];
-    }
-
-    return result.sort((a, b) => b.weight - a.weight).slice(0, 5);
-  }, [individualsData, organizationsData]);
-
-  const trendData = useMemo(() => {
-    if (USE_MOCK_DATA || (!individualsData && !organizationsData)) return MOCK_DAILY_TREND;
-
-    const dateWeights: Record<string, number> = {};
-
-    const allItems = [
-      ...(individualsData || []).map((i) => ({ date: i.submittedAt, weight: i.wasteWeight })),
-      ...(organizationsData || []).map((o) => ({ date: o.lastSubmission, weight: o.totalWeight })),
-    ];
-
-    allItems.sort((a, b) => a.date - b.date);
-
-    allItems.forEach((item) => {
-      const d = new Date(item.date);
-      const label = `${d.getDate()} ${d.toLocaleString("default", { month: "short" })}`;
-      dateWeights[label] = (dateWeights[label] || 0) + item.weight;
-    });
-
-    const result = Object.entries(dateWeights).map(([date, weight]) => ({
-      date,
-      weight: Math.round(weight * 10) / 10,
-    }));
-
-    if (result.length === 0) {
-      return [{ date: "Today", weight: 0 }];
-    }
-
-    return result;
-  }, [individualsData, organizationsData]);
-
   return (
       <div className="relative min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-[#050505] text-neutral-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-300">
         {/* Modern Premium Background Layer System */}
@@ -955,7 +848,6 @@ export default function EWasteDrive2026() {
                 </div>
               </div>
 
-<<<<<<< HEAD
               {/* RIGHT COLUMN: ANALYTICS PANEL (35% = lg:col-span-4) */}
               <div className="lg:col-span-4 space-y-6 min-w-0 relative">
                 {/* Analytics Panel Medium Glow — Secondary focal glow */}
@@ -970,16 +862,6 @@ export default function EWasteDrive2026() {
                   <div className="flex items-center gap-2 px-1">
                     <TrendingUp className="w-4 h-4 text-emerald-500" />
                     <h3 className="text-lg font-bold text-neutral-200">Drive Analytics</h3>
-=======
-                  {/* Inside Text for Donut Chart */}
-                  <div className="absolute flex flex-col items-center">
-                    <span className="text-[10px] text-neutral-500 font-medium">Top Category</span>
-                    <span className="text-sm font-bold text-neutral-200">
-                      {deviceData.reduce((prev, current) => (prev.value > current.value ? prev : current), { name: "None", value: 0 }).value > 0
-                        ? deviceData.reduce((prev, current) => (prev.value > current.value ? prev : current), { name: "None", value: 0 }).name
-                        : "None"}
-                    </span>
->>>>>>> feature/homepage-ewaste-popup
                   </div>
 
                   {/* Total E-Waste Collected Card */}
