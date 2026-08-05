@@ -99,14 +99,12 @@ export default function EWasteImpactModal() {
     }
 
     const isDismissed = localStorage.getItem("dcc_ewaste_modal_dont_show") === "true";
-    const hasBeenSeen = sessionStorage.getItem("dcc_ewaste_modal_seen") === "true";
 
-    if (isDismissed || hasBeenSeen) {
+    if (isDismissed) {
       return;
     }
 
     setOpen(true);
-    sessionStorage.setItem("dcc_ewaste_modal_seen", "true");
   }, []);
 
   // Lock body scroll when open
