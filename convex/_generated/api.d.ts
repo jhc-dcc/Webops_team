@@ -8,6 +8,11 @@
  * @module
  */
 
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
 import type * as clRegistrations from "../clRegistrations.js";
 import type * as contact from "../contact.js";
 import type * as ewaste from "../ewaste.js";
@@ -51,5 +56,3 @@ export declare const internal: FilterApi<
   typeof fullApiWithMounts,
   FunctionReference<any, "internal">
 >;
-
-export declare const components: {};
