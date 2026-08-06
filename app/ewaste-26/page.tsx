@@ -165,12 +165,20 @@ function PaavniMascot() {
     if (hasShownWelcome.current) return;
     hasShownWelcome.current = true;
 
-    timerRef.current = setTimeout(() => {
-      setIsVisible(false);
-      setCanClick(true);
-    }, 6000);
+    setIsVisible(false);
+
+    const introTimer = setTimeout(() => {
+      setIsVisible(true);
+
+      timerRef.current = setTimeout(() => {
+        setIsVisible(false);
+        setCanClick(true);
+      }, 6000);
+    }, 1200);
 
     return () => {
+      clearTimeout(introTimer);
+
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
@@ -202,10 +210,22 @@ function PaavniMascot() {
   };
 
   return (
-    <div
+    <motion.div
       className="paavni-mascot-container"
       onClick={handleClick}
       style={{ cursor: canClick ? "pointer" : "default" }}
+      initial={{
+        opacity: 0,
+      }}
+
+      animate={{
+        opacity: 1,
+      }}
+
+      transition={{
+        duration: 0.6,
+        delay: 0.8,
+      }}
     >
       <img
         src="/paavni-mascot-final.png"
@@ -237,7 +257,7 @@ function PaavniMascot() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 
