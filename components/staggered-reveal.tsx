@@ -36,6 +36,7 @@ export function StaggeredReveal({ text, className = '', delay = 50 }: StaggeredR
   }, []);
 
   useEffect(() => {
+    const target = containerRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -56,13 +57,13 @@ export function StaggeredReveal({ text, className = '', delay = 50 }: StaggeredR
       }
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    if (target) {
+      observer.observe(target);
     }
 
     return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+      if (target) {
+        observer.unobserve(target);
       }
     };
   }, [scrollDirection]);

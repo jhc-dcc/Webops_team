@@ -8,6 +8,15 @@ import { satoshi, zentry } from "@/fonts/font";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
+const COMMON_DOMAINS = [
+    "@gmail.com",
+    "@yahoo.com",
+    "@outlook.com",
+    "@iitm.ac.in",
+    "@hotmail.com",
+    "@protonmail.com"
+];
+
 export const Newsletter = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [email, setEmail] = useState("");
@@ -20,15 +29,6 @@ export const Newsletter = () => {
     
     const subscribe = useMutation(api.newsletter.subscribe);
     
-    const commonDomains = [
-        "@gmail.com",
-        "@yahoo.com",
-        "@outlook.com",
-        "@iitm.ac.in",
-        "@hotmail.com",
-        "@protonmail.com"
-    ];
-
     // Escape key handler
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -61,11 +61,11 @@ export const Newsletter = () => {
     // Type-ahead suggestions
     useEffect(() => {
         if (!email.includes("@") && email.length > 0) {
-            setSuggestion(email + commonDomains[0]);
+            setSuggestion(email + COMMON_DOMAINS[0]);
         } else if (email.includes("@")) {
             const [prefix, partialDomain] = email.split("@");
             if (partialDomain) {
-                const matchingDomain = commonDomains.find((domain) =>
+                const matchingDomain = COMMON_DOMAINS.find((domain) =>
                     domain.substring(1).startsWith(partialDomain)
                 );
 

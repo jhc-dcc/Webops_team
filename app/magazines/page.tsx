@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -201,11 +202,15 @@ const MagazinesPage = () => {
               onClick={() => handleCardClick(articles[0].url)}
             >
               <div className="card-hover overflow-hidden transition-transform duration-300">
-                <img
-                  src={articles[0].image as string}
-                  alt={articles[0].title}
-                  className="w-full h-full object-cover rounded-lg"
-                />
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                  <Image
+                    src={articles[0].image as string}
+                    alt={articles[0].title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -238,10 +243,12 @@ const MagazinesPage = () => {
                   onClick={() => handleCardClick(article.url)}
                 >
                   <div className="relative overflow-hidden pt-[150%] sm:pt-[140%] md:pt-[130%] lg:pt-[150%] xl:pt-[140%]">
-                    <img
+                    <Image
                       src={article.image}
                       alt={article.title}
-                      className="absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="absolute inset-0 object-contain transition-transform duration-500 group-hover:scale-110"
                     />
                   </div>
 

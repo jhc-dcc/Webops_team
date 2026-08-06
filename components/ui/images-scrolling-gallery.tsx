@@ -18,12 +18,10 @@ export interface ImagesScrollingGalleryProps {
 function GalleryCard({
   image,
   index,
-  total,
   isMobile,
 }: {
   image: GalleryImage;
   index: number;
-  total: number;
   isMobile: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -186,7 +184,6 @@ export function ImagesScrollingGallery({
               key={image.id}
               image={image}
               index={index}
-              total={images.length}
               isMobile={isMobile}
             />
           ))}

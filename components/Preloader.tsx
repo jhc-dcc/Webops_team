@@ -3,13 +3,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 
-function useIsomorphicLayoutEffect(callback: () => void | (() => void), dependencies: unknown[]) {
-  if (typeof window !== "undefined") {
-    useLayoutEffect(callback, dependencies);
-  } else {
-    useEffect(callback, dependencies);
-  }
-}
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 interface PreloaderProps {
   onComplete: () => void;
@@ -49,7 +43,9 @@ export function Preloader({ onComplete, heroRef }: PreloaderProps) {
       .to(containerRef.current, { autoAlpha: 0, duration: 0.2, ease: "power1.out" }, 1.55)
       .call(onComplete, [], 1.7);
 
-    return () => timeline.kill();
+    return () => {
+      timeline.kill();
+    };
   }, [heroRef, onComplete]);
 
   return (

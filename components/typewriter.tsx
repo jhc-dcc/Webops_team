@@ -29,6 +29,7 @@ export function Typewriter({
 
   useEffect(() => {
     if (triggerOnVisible && containerRef.current) {
+      const target = containerRef.current;
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -40,12 +41,10 @@ export function Typewriter({
         { threshold: 0.3 }
       );
 
-      observer.observe(containerRef.current);
+      observer.observe(target);
 
       return () => {
-        if (containerRef.current) {
-          observer.unobserve(containerRef.current);
-        }
+        observer.unobserve(target);
       };
     }
   }, [triggerOnVisible]);

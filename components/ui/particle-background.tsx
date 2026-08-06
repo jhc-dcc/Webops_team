@@ -211,7 +211,7 @@ const ParticleBackground: FC = () => {
       }
     });
     particlesArrayRef.current = newParticlesArray;
-  }, [drawConnections, createBurstParticle]); // Added createBurstParticle to dependencies if used in animate
+  }, [drawConnections]);
 
 
   const animate = useCallback(() => {

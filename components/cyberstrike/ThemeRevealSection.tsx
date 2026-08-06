@@ -36,6 +36,7 @@ export const ThemeRevealSection = () => {
   });
 
   useEffect(() => {
+    const target = sectionRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -51,13 +52,13 @@ export const ThemeRevealSection = () => {
       { threshold: 0.5 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    if (target) {
+      observer.observe(target);
     }
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+      if (target) {
+        observer.unobserve(target);
       }
     };
   }, [glitch]);

@@ -45,13 +45,6 @@ function CountUp({ end, duration = 1200, suffix = "" }: { end: number; duration?
   return <span>{formattedValue}{suffix}</span>;
 }
 
-// Fallback Mock Data matching ewaste-26
-const DEFAULT_TOP_CONTRIBUTORS = [
-  { rank: 1, name: "Rudra Sharma", wasteWeight: 85.5, medal: "🥇" },
-  { rank: 2, name: "Vaishnovee Iyer", wasteWeight: 72.3, medal: "🥈" },
-  { rank: 3, name: "Nigel D'Souza", wasteWeight: 68.0, medal: "🥉" },
-];
-
 const TARGET_GOAL_KG = 3000;
 
 export default function EWasteImpactModal() {
@@ -89,7 +82,7 @@ export default function EWasteImpactModal() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       // Expose reset helper on window object for testing / manual reset
-      (window as any).resetEWasteModal = () => {
+      (window as Window & { resetEWasteModal?: () => void }).resetEWasteModal = () => {
         localStorage.removeItem("dcc_ewaste_modal_dont_show");
         localStorage.removeItem("dcc_ewaste_modal_seen");
         sessionStorage.removeItem("dcc_ewaste_modal_seen");

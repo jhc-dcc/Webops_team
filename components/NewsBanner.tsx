@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, Newspaper, ExternalLink } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -46,6 +46,14 @@ export default function NewsBanner({
     }
   }, [showOnlyOnce]);
 
+  const handleCloseModal = useCallback(() => {
+    setShowModal(false);
+
+    if (showOnlyOnce && typeof window !== 'undefined') {
+      localStorage.setItem('newsBannerLastSeen', Date.now().toString());
+    }
+  }, [showOnlyOnce]);
+
   useEffect(() => {
     if (finalAutoHideDuration && showModal) {
       const timer = setTimeout(() => {
@@ -54,15 +62,7 @@ export default function NewsBanner({
 
       return () => clearTimeout(timer);
     }
-  }, [showModal, finalAutoHideDuration]);
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    
-    if (showOnlyOnce && typeof window !== 'undefined') {
-      localStorage.setItem('newsBannerLastSeen', Date.now().toString());
-    }
-  };
+  }, [showModal, finalAutoHideDuration, handleCloseModal]);
 
   if (!showModal) return null;
 
