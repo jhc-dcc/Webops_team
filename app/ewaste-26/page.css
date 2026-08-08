@@ -67,16 +67,32 @@
 /* Mobile (< 640px) */
 @media (max-width: 639px) {
   .paavni-mascot-container {
-    width: 72px;
-    right: 4px;
+    width: 56px;
+    right: 8px;
+    top: 84%;
+    transform: translateY(-50%);
+  }
+
+  .paavni-popup {
+    width: 160px;
+    right: 105%;
+    top: 12%;
   }
 }
 
 /* Very small mobile (< 380px) */
 @media (max-width: 379px) {
   .paavni-mascot-container {
-    width: 60px;
-    right: 2px;
+    width: 48px;
+    right: 6px;
+    top: 87%;
+    transform: translateY(-50%);
+  }
+
+  .paavni-popup {
+    width: 145px;
+    right: 102%;
+    top: 10%;
   }
 }
 
