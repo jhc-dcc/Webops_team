@@ -1,1 +1,186 @@
-/* Placeholder CSS for ewaste-26 page */
+/* ==========================================
+   PAAVNI MASCOT - E-Waste '26 Page Only
+   ==========================================
+   All styles scoped to mascot elements only.
+   Does NOT affect any other page or component.
+   ========================================== */
+
+/* Absolute-position mascot container - right side of hero area, scrolls with the page */
+.paavni-mascot-container {
+  position: absolute;
+  right: 1vw;
+  top: 58%;
+  transform: translateY(-50%);
+  width: 155px;
+  z-index: 20;
+
+  pointer-events: auto;
+  /* <-- IMPORTANT */
+  cursor: pointer;
+}
+
+/* The mascot image itself */
+.paavni-mascot-image {
+  pointer-events: none;
+}
+
+
+
+/* ==========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================== */
+
+/* Extra large desktops (>= 1600px) */
+@media (min-width: 1600px) {
+  .paavni-mascot-container {
+    width: 180px;
+    right: 3vw;
+  }
+}
+
+/* Large desktops (1440px - 1599px) */
+@media (min-width: 1440px) and (max-width: 1599px) {
+  .paavni-mascot-container {
+    width: 165px;
+    right: 2.5vw;
+  }
+}
+
+/* Standard desktop (1024px - 1439px) - default values apply */
+
+/* Tablet landscape (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .paavni-mascot-container {
+    width: 120px;
+    right: 8px;
+  }
+}
+
+/* Tablet portrait (640px - 767px) */
+@media (min-width: 640px) and (max-width: 767px) {
+  .paavni-mascot-container {
+    width: 95px;
+    right: 6px;
+  }
+}
+
+/* Mobile (< 640px) */
+@media (max-width: 639px) {
+  .paavni-mascot-container {
+    width: 56px;
+    right: 8px;
+    top: 84%;
+    transform: translateY(-50%);
+  }
+
+  .paavni-popup {
+    width: 160px;
+    right: 105%;
+    top: 12%;
+  }
+}
+
+/* Very small mobile (< 380px) */
+@media (max-width: 379px) {
+  .paavni-mascot-container {
+    width: 48px;
+    right: 6px;
+    top: 87%;
+    transform: translateY(-50%);
+  }
+
+  .paavni-popup {
+    width: 145px;
+    right: 102%;
+    top: 10%;
+  }
+}
+
+.paavni-popup {
+
+  position: absolute;
+
+  right: 108%;
+
+  top: 18%;
+
+  width: 225px;
+
+  background: rgba(20, 20, 20, .92);
+
+  border: 1px solid rgba(60, 255, 160, .25);
+
+  border-radius: 14px;
+
+  padding: 14px 18px;
+
+  color: white;
+
+  backdrop-filter: blur(14px);
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+
+  pointer-events: none;
+
+  z-index: 30;
+}
+
+.popup-title {
+
+  color: #32d583;
+
+  font-weight: 700;
+
+  margin-bottom: 6px;
+
+  padding-left: 8px;
+
+}
+
+.popup-text {
+
+  color: #d7d7d7;
+
+  line-height: 1.5;
+
+  font-size: .92rem;
+
+  padding-left: 8px;
+
+}
+
+.paavni-popup::after {
+  content: "";
+
+  position: absolute;
+
+  right: -8px;
+
+  top: 34px;
+
+  width: 16px;
+
+  height: 16px;
+
+  background: rgba(20, 20, 20, .92);
+
+  transform: rotate(45deg);
+
+  border-right: 1px solid rgba(60, 255, 160, .25);
+
+  border-top: 1px solid rgba(60, 255, 160, .25);
+}
+
+@keyframes popupFade {
+
+  from {
+    opacity: 0;
+    transform: translateX(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+}
