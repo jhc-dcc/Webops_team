@@ -10,6 +10,7 @@ import {
   useScroll,
 } from "motion/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { HoverBorderGradient } from "./hover-border-gradient";
 
@@ -49,6 +50,7 @@ const navItems = [
 ];
 
 export const FloatingNav = ({ className }: { className?: string }) => {
+  const pathname = usePathname();
   const { scrollYProgress } = useScroll();
   const isMobile = useIsMobile();
   const [visible, setVisible] = useState(true); // Changed initial state to true
@@ -78,6 +80,17 @@ export const FloatingNav = ({ className }: { className?: string }) => {
       }
     }
   });
+
+  if (
+    pathname === "/" ||
+    pathname === "/blogs" ||
+    pathname === "/about-us" ||
+    pathname === "/sponsors" ||
+    pathname === "/contact-us" ||
+    pathname === "/magazines"
+  )
+    return null;
+
   return (
     <>
       <AnimatePresence mode="wait">
@@ -106,9 +119,10 @@ export const FloatingNav = ({ className }: { className?: string }) => {
           {!isMobile && (
             <>
               {navItems.map((navItem, idx: number) => (
-                <motion.a
+                <Link
                   key={`link-${navItem.name}-${idx}`}
                   href={navItem.link}
+                  prefetch={true}
                   className={cn(
                     "relative items-center flex space-x-1 text-foreground transition-colors duration-300 group"
                   )}
@@ -142,7 +156,7 @@ export const FloatingNav = ({ className }: { className?: string }) => {
                       ease: "easeOut"
                     }}
                   />
-                </motion.a>
+                </Link>
               ))}
               <Link href={"/cyberstrike-25"}>
                 <motion.div
@@ -213,16 +227,12 @@ export const FloatingNav = ({ className }: { className?: string }) => {
             >
               <div className="p-4 space-y-3">
                 {navItems.map((navItem, idx: number) => (
-                  <motion.a
+                  <Link
                     key={`mobile-link-${navItem.name}-${idx}`}
                     href={navItem.link}
+                    prefetch={true}
                     onClick={() => setMobileMenuOpen(false)}
                     className="block w-full text-left px-4 py-3 text-sm text-foreground rounded-lg transition-all duration-200 relative group overflow-hidden"
-                    whileHover={{
-                      scale: 1.02,
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     <span className="relative z-10 group-hover:text-primary transition-colors duration-300">
                       {navItem.name}
@@ -247,7 +257,7 @@ export const FloatingNav = ({ className }: { className?: string }) => {
                         ease: "easeOut"
                       }}
                     />
-                  </motion.a>
+                  </Link>
                 ))}
               </div>
             </motion.div>

@@ -3,10 +3,10 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = createMetadata({
   title: "Register - JHC Dot Com Club | Join Our Tech Community",
-  description: "Register for JHC Dot Com Club events including Cyberstrike 2025, workshops, and tech competitions. Join Jai Hind College's premier technology community today!",
+  description: "Register for JHC Dot Com Club events including Cyberstrike 2026, workshops, and tech competitions. Join Jai Hind College's premier technology community today!",
   keywords: [
     "JHC registration",
-    "Cyberstrike 2025 registration",
+    "Cyberstrike 2026 registration",
     "Tech event registration",
     "Join DCC",
     "Student registration",

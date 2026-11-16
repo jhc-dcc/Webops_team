@@ -12,7 +12,7 @@ type TimeMap = {
   seconds: number;
 };
 
-const TARGET_DATE = new Date("2025-12-10T09:00:00+05:30").getTime();
+const TARGET_DATE = new Date("2026-11-28T00:00:00+05:30").getTime();
 
 export const CountdownSection = () => {
   const [timeLeft, setTimeLeft] = useState<TimeMap>({
@@ -100,7 +100,7 @@ export const CountdownSection = () => {
               satoshi.className
             )}
           >
-            Circle 10 December on your calendar. That&apos;s when the outage
+            Circle 28 November on your calendar. That&apos;s when the outage
             becomes real and the city joins us inside the simulation.
           </p>
         </div>

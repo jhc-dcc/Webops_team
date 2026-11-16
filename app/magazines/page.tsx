@@ -1,286 +1,420 @@
 "use client";
 
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
-import { Calendar, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { zentry } from "@/fonts/font";
-import { cn } from "@/lib/utils";
-import "./magazines.css";
+import { Navbar } from "@/components/home/Navbar";
+import { FooterSection } from "@/components/home/FooterSection";
+import { CustomCursor } from "@/components/home/CustomCursor";
+import { anton, dmSans } from "@/fonts/font";
 
-const MagazinesPage = () => {
-  const sectionsRef = useRef<HTMLDivElement[]>([]);
+const MARQUEE_WORDS = [
+  "Quick reads",
+  "Big ideas",
+  "Future tech",
+  "Magazines",
+  "Newsletters",
+];
 
-  const addToRefs = (el: HTMLDivElement) => {
-    if (el && !sectionsRef.current.includes(el)) sectionsRef.current.push(el);
+interface VolumeItem {
+  vol: string;
+  year: string;
+  title: string;
+  image: string;
+  url: string;
+}
+
+const RECENT_RELEASE = {
+  year: "2025",
+  title: "Magazine-Issue 1",
+  url: "https://heyzine.com/flip-book/263c4f6940.html?fbclid=PAVERDUAMbh_JleHRuA2FlbQIxMAABp2xhlSXwA3HVec5oUiuOjZ-OjKgkNBfr43Qt6VSvgSdOdy6Hh0Nnjr5LlLF2_aem_iYhYAgxyAqVpeLiVFn7WTw",
+  image: "/magzine1img.png",
+  editionTag: "Latest edition",
+  badge: "New",
+};
+
+const PAST_VOLUMES: VolumeItem[] = [
+  {
+    vol: "6",
+    year: "2024",
+    title: "Newsletter Volume 6",
+    image: "/magzine/vol6.jpg",
+    url: "https://heyzine.com/flip-book/2b12fc8496.html",
+  },
+  {
+    vol: "5",
+    year: "2023",
+    title: "Newsletter Volume 5",
+    image: "/magzine/vol5.jpg",
+    url: "https://heyzine.com/flip-book/3850cde9d3.html",
+  },
+  {
+    vol: "4",
+    year: "2021",
+    title: "Newsletter Volume 4",
+    image: "/magzine/vol4.jpg",
+    url: "https://heyzine.com/flip-book/07612552b2.html",
+  },
+  {
+    vol: "3",
+    year: "2020",
+    title: "Newsletter Volume 3",
+    image: "/magzine/vol3.png",
+    url: "https://heyzine.com/flip-book/ed4ecf4831.html",
+  },
+  {
+    vol: "2",
+    year: "December 2019",
+    title: "Newsletter Volume 2",
+    image: "/magzine/vol2.jpg",
+    url: "https://heyzine.com/flip-book/29f054e0f3.html",
+  },
+  {
+    vol: "1",
+    year: "April 2019",
+    title: "Newsletter Volume 1",
+    image: "/magzine/vol1.jpg",
+    url: "https://heyzine.com/flip-book/c94dcd94c0.html",
+  },
+];
+
+export default function MagazinesPage() {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hoverVol, setHoverVol] = useState<string>("6");
+  const [hoverImg, setHoverImg] = useState<string>("/magzine/vol6.jpg");
+  const [isHoverActive, setIsHoverActive] = useState<boolean>(false);
+
+  // Hover preview physics refs
+  const hoverCardRef = useRef<HTMLDivElement>(null);
+  const mousePosRef = useRef<{ x: number; y: number; cx: number; cy: number; rot: number }>({
+    x: 0,
+    y: 0,
+    cx: 0,
+    cy: 0,
+    rot: 0,
+  });
+  const rafIdRef = useRef<number | null>(null);
+  const isRunningRef = useRef<boolean>(false);
+
+  // Smooth floating hover card physics loop
+  const updateHoverCard = useCallback(() => {
+    const card = hoverCardRef.current;
+    if (!card) return;
+
+    const pos = mousePosRef.current;
+    const dx = pos.x - pos.cx;
+    pos.cx += dx * 0.14;
+    pos.cy += (pos.y - pos.cy) * 0.14;
+    pos.rot += (Math.max(-14, Math.min(14, dx * 0.35)) - pos.rot) * 0.15;
+
+    card.style.transform = `translate3d(${pos.cx + 28}px, ${pos.cy - 120}px, 0) rotate(${pos.rot}deg)`;
+
+    if (card.classList.contains("on") || Math.abs(dx) > 0.5) {
+      rafIdRef.current = requestAnimationFrame(updateHoverCard);
+    } else {
+      isRunningRef.current = false;
+    }
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLUListElement>) => {
+    mousePosRef.current.x = e.clientX;
+    mousePosRef.current.y = e.clientY;
+  }, []);
+
+  const handleRowMouseEnter = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    item: VolumeItem
+  ) => {
+    setHoverVol(item.vol);
+    setHoverImg(item.image);
+    setIsHoverActive(true);
+
+    if (!isHoverActive) {
+      mousePosRef.current.cx = mousePosRef.current.x = e.clientX;
+      mousePosRef.current.cy = mousePosRef.current.y = e.clientY;
+    }
+
+    if (!isRunningRef.current) {
+      isRunningRef.current = true;
+      rafIdRef.current = requestAnimationFrame(updateHoverCard);
+    }
+  };
+
+  const handleRowMouseLeave = () => {
+    setIsHoverActive(false);
   };
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 300);
+
+    // Heading text reveals (.rv)
+    const revealEls = document.querySelectorAll(".rv");
+    const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("revealed");
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" }
+      { threshold: 0.3 }
     );
+    revealEls.forEach((el) => io.observe(el));
 
-    sectionsRef.current.forEach((section) => {
-      if (section) observer.observe(section);
-    });
+    // Scroll listener for dynamic navbar themes & FAB visibility
+    const nav = document.querySelector<HTMLElement>("nav");
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>("header, section, footer")
+    );
+    const fab = document.getElementById("fab");
+    let lastY = 0;
 
-    return () => observer.disconnect();
-  }, []);
+    const onScroll = () => {
+      const y = window.scrollY;
+      const diff = y - lastY;
+      if (nav) {
+        nav.classList.toggle("at", y < 24);
+        if (Math.abs(diff) > 6) {
+          nav.classList.toggle("hide", diff > 0 && y > 220);
+          lastY = y;
+        }
 
-  const articles = [
-    {
-      title: "Magazine-Issue 1",
-      // excerpt:
-      //   "Deep dive into how artificial neural networks are revolutionizing machine learning and reshaping our understanding of intelligence.",
-      image: "/magzine1img.png",
-      // category: "Artificial Intelligence",
-      date: "2025",
-      // readTime: "12 min",
-      featured: true,
-      // icon: <Cpu className="h-5 w-5" />,
-      url: "https://heyzine.com/flip-book/263c4f6940.html?fbclid=PAVERDUAMbh_JleHRuA2FlbQIxMAABp2xhlSXwA3HVec5oUiuOjZ-OjKgkNBfr43Qt6VSvgSdOdy6Hh0Nnjr5LlLF2_aem_iYhYAgxyAqVpeLiVFn7WTw",
-    },
-    {
-      title: "Newsletter Volume 6",
+        // Section colour theme
+        let theme: "p" | "l" | "d" = "d";
+        sections.forEach((s) => {
+          const r = s.getBoundingClientRect();
+          if (r.top <= 32 && r.bottom > 32) {
+            if (s.matches(".hero")) theme = "p";
+            else if (s.matches(".jr")) theme = "l";
+            else theme = "d";
+          }
+        });
+        nav.dataset.t = theme;
+      }
 
-      image: "/magzine/vol6.jpg",
-      // category: "Quantum Tech",
-      date: "2024",
-      // readTime: "8 min",
-      featured: false,
-      // icon: <Zap className="h-5 w-5" />,
-      url: "https://heyzine.com/flip-book/2b12fc8496.html",
-    },
-    {
-      title: "Newsletter Volume 5",
-      // excerpt:
-      //   "From DNA storage to crystalline memory, exploring the next generation of data preservation technologies.",
-      image: "/magzine/vol5.jpg",
-      // category: "Data Science",
-      date: "2023",
-      // readTime: "6 min",
-      featured: false,
-      // icon: <Database className="h-5 w-5" />,
-      url: "https://heyzine.com/flip-book/3850cde9d3.html",
-    },
-    {
-      title: "Newsletter Volume 4",
-      // excerpt:
-      //   "As virtual worlds become more prevalent, new security challenges emerge that require innovative solutions.",
-      image: "/magzine/vol4.jpg",
-      // category: "Security",
-      date: "2021",
-      // readTime: "10 min",
-      featured: false,
-      // icon: <Cpu className="h-5 w-5" />,
-      url: "https://heyzine.com/flip-book/07612552b2.html",
-    },
-    {
-      title: " Newsletter Volume 3",
-      // excerpt:
-      //   "Exploring how blockchain technology is transforming industries beyond cryptocurrency and reshaping digital trust.",
-      image: "/magzine/vol3.png",
-      // category: "Blockchain",
-      date: "2020",
-      // readTime: "9 min",
-      featured: false,
-      // icon: <Zap className="h-5 w-5" />,
-      url: "https://heyzine.com/flip-book/ed4ecf4831.html",
-    },
-    {
-      title: "Newsletter Volume 2",
-      // excerpt:
-      //   "How Internet of Things technology is building the foundation for tomorrow's connected urban environments.",
-      image: "/magzine/vol2.jpg",
-      // category: "IoT Technology",
-      date: "December 2019",
-      // readTime: "7 min",
-      featured: false,
-      // icon: <Database className="h-5 w-5" />,
-      url: "https://heyzine.com/flip-book/29f054e0f3.html",
-    },
-    {
-      title: "Newsletter Volume 1",
-      // excerpt:
-      //   "Addressing the moral implications and responsibilities in developing AI systems that impact human lives.",
-      image: "/magzine/vol1.jpg",
-      // category: "AI Ethics",
-      date: "April 2019",
-      // readTime: "11 min",
-      featured: true,
-      // icon: <Cpu className="h-5 w-5" />,
-      url: "https://heyzine.com/flip-book/c94dcd94c0.html",
-    },
-  ];
+      // FAB visibility
+      if (fab) {
+        fab.classList.toggle(
+          "s",
+          y > window.innerHeight * 0.7 && !document.body.classList.contains("lock")
+        );
+      }
+    };
 
-  const handleCardClick = (url: string) => {
-    if (url.startsWith("http")) window.open(url, "_blank");
-    else window.location.href = url;
-  };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      clearTimeout(timer);
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [updateHoverCard]);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Hero Section */}
-      <section className="relative h-screen overflow-hidden hero-section">
-        <video
-          width="100%"
-          height="100%"
-          playsInline
-          autoPlay
-          loop
-          muted
-          className="absolute inset-0 w-full h-full object-cover object-center md:object-top"
-        >
-          <source src="/magzine/herovid4.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80"></div>
+    <div
+      className={`magazine-root home-root ${isLoaded ? "go" : ""} ${anton.variable} ${dmSans.variable}`}
+    >
+      <Navbar />
+      <CustomCursor />
 
-        <div className="relative h-full flex items-center justify-center px-4 text-center">
-          <div ref={addToRefs} className="scroll-reveal">
-            <h1
-              className={cn(
-                "text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-wide",
-                zentry.className
-              )}
-            >
-              The Digital <span className="text-red-500">Dispatch</span>
-            </h1>
-            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl mt-6 text-gray-300 font-light tracking-wide">
-              Quick reads. Big ideas. Future tech.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Floating CTA for Mobile */}
+      <a className="btn wh fab" id="fab" href="#past">
+        Past Volumes
+      </a>
 
-      {/* Featured Article */}
-      <section className="py-16 px-4 sm:px-6 lg:px-20 magazine-section">
-        <div className="max-w-7xl mx-auto">
-          <div ref={addToRefs} className="scroll-reveal mb-12 text-center">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-              Recent <span className="text-red-500">Release</span>
-            </h2>
-            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
-              Discover our latest edition featuring cutting-edge tech insights
-              and innovations.
-            </p>
-          </div>
-
-          <div
-            ref={addToRefs}
-            className="scroll-reveal grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center"
+      {/* ── HERO SECTION ─────────────────────────────────────────────────── */}
+      <header className="hero" id="hero">
+        {/* Rotating badge */}
+        <svg className="bdg" viewBox="0 0 200 200" aria-hidden="true">
+          <defs>
+            <path
+              id="cp"
+              d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"
+            />
+          </defs>
+          <text
+            fontSize="19"
+            fontWeight="700"
+            fill="#1B1030"
+            fontFamily="DM Sans,sans-serif"
           >
-            {/* Featured Article Left */}
-            <div className="space-y-4 lg:space-y-6">
-              <div className="flex items-center space-x-3 text-gray-400 text-sm sm:text-base">
-                <Calendar className="h-5 w-5" />
-                <span>{articles[0].date}</span>
-              </div>
+            <textPath href="#cp" textLength="480" lengthAdjust="spacing">
+              JAI HIND COLLEGE • EST. 2014 • TECH CLUB •
+            </textPath>
+          </text>
+          <circle cx="100" cy="100" r="14" fill="#1B1030" />
+        </svg>
 
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-white">
-                {articles[0].title}
-              </h3>
-
-              <Button
-                variant="outline"
-                className="border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300"
-                onClick={() => handleCardClick(articles[0].url)}
-              >
-                READ MORE
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Featured Article Right */}
-            <div
-              className="relative cursor-pointer"
-              onClick={() => handleCardClick(articles[0].url)}
-            >
-              <div className="card-hover overflow-hidden transition-transform duration-300">
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
-                  <Image
-                    src={articles[0].image as string}
-                    alt={articles[0].title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-            </div>
+        <div className="wrap">
+          <h1 className="h1" aria-label="The Digital Dispatch">
+            <s>
+              <i>The Digital</i>
+            </s>
+            <s>
+              <i>Dispatch</i>
+            </s>
+          </h1>
+          <div className="c2">
+            <p>Quick reads. Big ideas. Future tech.</p>
+            <a className="btn dk" href="#recent">
+              Recent Release
+            </a>
+            <a className="btn ol" href="#past" style={{ marginLeft: 8 }}>
+              Past Volumes
+            </a>
           </div>
+        </div>
+
+        {/* Crossing marquee tapes */}
+        <div className="tp t1" aria-hidden="true">
+          <div className="mq">
+            {[...Array(4)].flatMap((_, i) =>
+              MARQUEE_WORDS.map((w, j) => (
+                <span key={`m1-${i}-${j}`}>
+                  <span>{w}</span>
+                  <span>●</span>
+                </span>
+              ))
+            )}
+          </div>
+        </div>
+        <div className="tp t2" aria-hidden="true">
+          <div className="mq">
+            {[...Array(4)].flatMap((_, i) =>
+              MARQUEE_WORDS.map((w, j) => (
+                <span key={`m2-${i}-${j}`}>
+                  <span>{w}</span>
+                  <span>●</span>
+                </span>
+              ))
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* ── RECENT RELEASE SECTION ───────────────────────────────────────── */}
+      <section className="rec" id="recent">
+        <div className="wrap">
+          <h2 className="hd rv">
+            <span className="ln">
+              <i>Recent Release</i>
+            </span>
+          </h2>
+          <p className="lead">
+            Discover our latest edition featuring cutting-edge tech insights and
+            innovations.
+          </p>
+
+          <article className="fe">
+            <div>
+              <div className="tr">
+                <span>{RECENT_RELEASE.editionTag}</span>
+                <span className="tg">{RECENT_RELEASE.badge}</span>
+              </div>
+              <div className="yr">{RECENT_RELEASE.year}</div>
+              <h3>{RECENT_RELEASE.title}</h3>
+              <a
+                className="rd"
+                href={RECENT_RELEASE.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                READ MORE →
+              </a>
+            </div>
+
+            <div className="cv" aria-hidden="true">
+              <small>The Digital Dispatch</small>
+              <b>Issue 1</b>
+              {/* Cover Mockup Image */}
+              <Image
+                src={RECENT_RELEASE.image}
+                alt="Magazine Issue 1 Cover"
+                fill
+                sizes="(max-width: 900px) 78vw, 340px"
+                className="object-cover rounded-[14px]"
+                priority
+              />
+            </div>
+          </article>
         </div>
       </section>
 
-      {/* Past Volumes */}
-      <section className="py-16 px-4 sm:px-6 lg:px-20 magazine-section">
-        <div className="max-w-7xl mx-auto">
-          <div ref={addToRefs} className="scroll-reveal mb-12 text-center">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-              Past <span className="text-red-500">Volumes</span>
-            </h2>
-            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
-              Explore our archive of previous editions and revisit
-              groundbreaking stories.
-            </p>
-          </div>
+      {/* ── PAST VOLUMES SECTION ─────────────────────────────────────────── */}
+      <section className="jr" id="past">
+        <div className="wrap">
+          <h2 className="hd rv">
+            <span className="ln">
+              <i>Past Volumes</i>
+            </span>
+          </h2>
+          <p className="lead">
+            Explore our archive of previous editions and revisit groundbreaking
+            stories.
+          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
-            {articles.slice(1).map((article, index) => (
-              <div
-                key={index}
-                ref={addToRefs}
-                className="scroll-reveal"
-                style={{ transitionDelay: `${index * 0.2}s` }}
-              >
-                <Card
-                  className="bg-gradient-to-br from-red-900/10 to-black border-2 border-red-900/30 hover:border-red-500/70 transition-all duration-300 group cursor-pointer h-full rounded-xl overflow-hidden"
-                  onClick={() => handleCardClick(article.url)}
+          <ul className="vl" onPointerMove={handlePointerMove}>
+            {PAST_VOLUMES.map((item) => (
+              <li key={item.vol}>
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-img={item.image}
+                  data-n={item.vol}
+                  onMouseEnter={(e) => handleRowMouseEnter(e, item)}
+                  onMouseLeave={handleRowMouseLeave}
                 >
-                  <div className="relative overflow-hidden pt-[150%] sm:pt-[140%] md:pt-[130%] lg:pt-[150%] xl:pt-[140%]">
-                    <Image
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="absolute inset-0 object-contain transition-transform duration-500 group-hover:scale-110"
-                    />
-                  </div>
+                  <em>{item.year}</em>
+                  <h3>{item.title}</h3>
+                  <span>READ MORE →</span>
 
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="flex items-center space-x-2 text-gray-400 text-sm sm:text-base mb-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>{article.date}</span>
-                    </div>
-
-                    <h3 className="font-bold text-lg sm:text-xl md:text-2xl mb-3 line-clamp-2 text-white group-hover:text-red-500 transition-colors">
-                      {article.title}
-                    </h3>
-
-                    <Button
-                      variant="ghost"
-                      className="text-red-500 hover:bg-red-500/20 p-0 h-auto text-sm sm:text-base"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCardClick(article.url);
-                      }}
-                    >
-                      READ MORE →
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
+                  {/* Inline touch thumbnail for mobile */}
+                  <img
+                    className="tm"
+                    alt={item.title}
+                    loading="lazy"
+                    src={item.image}
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
+                  />
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
+
+      {/* ── FLOATING HOVER PREVIEW CARD (DESKTOP) ─────────────────────────── */}
+      <div
+        className={`hv ${isHoverActive ? "on" : ""}`}
+        id="hv"
+        ref={hoverCardRef}
+        aria-hidden="true"
+      >
+        <div className="ph">
+          <small>Newsletter</small>
+          <b id="hn">Vol {hoverVol}</b>
+        </div>
+        {hoverImg && (
+          <img
+            id="hi"
+            src={hoverImg}
+            alt="Volume Preview"
+            onError={(e) => {
+              (e.target as HTMLElement).style.display = "none";
+            }}
+          />
+        )}
+      </div>
+
+      {/* ── FOOTER SECTION ───────────────────────────────────────────────── */}
+      <FooterSection />
     </div>
   );
-};
-
-export default MagazinesPage;
+}

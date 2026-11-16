@@ -29,7 +29,7 @@ const getWelcomeEmailTemplate = (fullName: string, team: string) => {
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
       <div style="background-color: #000; color: #fff; padding: 30px; border-radius: 10px; text-align: center;">
         <h1 style="color: #dc2626; margin: 0 0 10px 0;">Welcome to DCC!</h1>
-        <h2 style="margin: 0; font-weight: normal;">Dot Com Club Membership 2025-26</h2>
+        <h2 style="margin: 0; font-weight: normal;">Dot Com Club Membership 2026-27</h2>
       </div>
       
       <div style="background-color: #fff; padding: 30px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
@@ -77,8 +77,8 @@ const getWelcomeEmailTemplate = (fullName: string, team: string) => {
       </div>
       
       <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
-        <p>This email was sent to you because you registered for DCC Membership 2025-26.</p>
-        <p>© 2025 Dot Com Club. All rights reserved.</p>
+        <p>This email was sent to you because you registered for DCC Membership 2026-27.</p>
+        <p>© 2026 Dot Com Club. All rights reserved.</p>
       </div>
     </div>
   `;
@@ -94,13 +94,13 @@ const getCLRegistrationTemplate = (
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
       <div style="background-color: #000; color: #fff; padding: 30px; border-radius: 10px; text-align: center;">
         <h1 style="color: #dc2626; margin: 0 0 10px 0;">CL Registration Confirmed!</h1>
-        <h2 style="margin: 0; font-weight: normal;">Contingent Leader - Cyberstrike 2025</h2>
+        <h2 style="margin: 0; font-weight: normal;">Contingent Leader - Cyberstrike 2026</h2>
       </div>
       
       <div style="background-color: #fff; padding: 30px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <h3 style="color: #dc2626;">Hello ${clName}!</h3>
         
-        <p>Thank you for registering as a <strong>Contingent Leader</strong> for <strong>${collegeName}</strong>. We're excited to have you lead your college contingent at Cyberstrike 2025!</p>
+        <p>Thank you for registering as a <strong>Contingent Leader</strong> for <strong>${collegeName}</strong>. We're excited to have you lead your college contingent at Cyberstrike 2026!</p>
         
         <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin: 20px 0;">
           <h4 style="color: #dc2626; margin: 0 0 10px 0;">Registration Details:</h4>
@@ -112,14 +112,14 @@ const getCLRegistrationTemplate = (
         </div>
         
         <div style="background-color: #e8f5e8; border: 1px solid #4ade80; border-radius: 8px; padding: 20px; margin: 20px 0;">
-          <h4 style="color: #059669; margin: 0 0 10px 0;">CL Meet - 12th November 2025</h4>
+          <h4 style="color: #059669; margin: 0 0 10px 0;">CL Meet - 28th November 2026</h4>
           ${
             attendingClMeet
               ? `
             <p style="margin: 5px 0;">You have confirmed your attendance for the CL Meet.</p>
             <p style="margin: 10px 0; font-weight: bold;">What to expect:</p>
             <ul style="margin: 10px 0; padding-left: 20px;">
-              <li>Detailed briefing about Cyberstrike 2025</li>
+              <li>Detailed briefing about Cyberstrike 2026</li>
               <li>Rules and regulations for all events</li>
               <li>Registration process for team members</li>
               <li>Important dates and schedules</li>
@@ -136,7 +136,7 @@ const getCLRegistrationTemplate = (
         <div style="background-color: #f3e8ff; border: 1px solid #c084fc; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
           <h4 style="color: #7c3aed; margin: 0 0 15px 0;">Download Your Digital Access Card</h4>
           <p style="margin: 10px 0;">Your personalized CL access card is ready!</p>
-          <a href="https://www.jhcdotcomclub.com/cyberstrike-25/cl/confirm" 
+          <a href="https://www.jhcdotcomclub.com/cyberstrike-26/cl/confirm" 
              style="display: inline-block; background-color: #7c3aed; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 10px 0; font-weight: bold;">
             View & Download ID Cards
           </a>
@@ -169,8 +169,8 @@ const getCLRegistrationTemplate = (
       </div>
       
       <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
-        <p>This email was sent because you registered as a Contingent Leader for Cyberstrike 2025.</p>
-        <p>© 2025 Dot Com Club. All rights reserved.</p>
+        <p>This email was sent because you registered as a Contingent Leader for Cyberstrike 2026.</p>
+        <p>© 2026 Dot Com Club. All rights reserved.</p>
       </div>
     </div>
   `;
@@ -229,7 +229,7 @@ const getNewsletterWelcomeTemplate = (email: string) => {
       
       <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
         <p>This email was sent to ${email} because you subscribed to our newsletter.</p>
-        <p>© 2025 Dot Com Club. All rights reserved.</p>
+        <p>© 2026 Dot Com Club. All rights reserved.</p>
         <p style="margin-top: 10px;">
           <a href="#" style="color: #999; text-decoration: none;">Unsubscribe</a> | 
         </p>
@@ -322,7 +322,7 @@ export async function POST(request: NextRequest) {
         const clMailOptions = {
           from: `"DCC - Dot Com Club" <${process.env.SMTP_USER}>`,
           to: clEmail,
-          subject: "CL Registration Confirmed - Cyberstrike 2025",
+          subject: "CL Registration Confirmed - Cyberstrike 2026",
           html: getCLRegistrationTemplate(clName, collegeName, attendingClMeet),
         };
 
@@ -333,7 +333,7 @@ export async function POST(request: NextRequest) {
         const aclMailOptions = {
           from: `"DCC - Dot Com Club" <${process.env.SMTP_USER}>`,
           to: aclEmail,
-          subject: "Assistant CL Registration Confirmed - Cyberstrike 2025",
+          subject: "Assistant CL Registration Confirmed - Cyberstrike 2026",
           html: getCLRegistrationTemplate(
             "Assistant Contingent Leader",
             collegeName,

@@ -121,7 +121,7 @@ export default function EwasteLeaderboardPage() {
             FULL <span className="text-primary">LEADERBOARD</span>
           </h1>
           <p className={cn("text-sm sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-4", satoshi.className)}>
-            Complete rankings for all participants in the E-waste Drive 2025
+            Complete rankings for all participants in the E-waste Drive 2026
           </p>
         </div>
 

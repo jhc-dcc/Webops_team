@@ -4,14 +4,14 @@ export const siteConfig = {
   name: "JHC Dot Com Club",
   title: "JHC Dot Com Club - Jai Hind College Technology Community",
   description:
-    "Official website of Jai Hind College Dot Com Club. Join us for Cyberstrike 2025, E-waste drives, tech events, workshops, and innovation at Mumbai's premier technology community.",
+    "Official website of Jai Hind College Dot Com Club. Join us for Cyberstrike 2026, E-waste drives, tech events, workshops, and innovation at Mumbai's premier technology community.",
   url: "https://www.jhcdotcomclub.com",
   ogImage: "https://www.jhcdotcomclub.com/images/og-image.jpg",
   keywords: [
     "Jai Hind College",
     "Dot Com Club",
     "DCC",
-    "Cyberstrike 2025",
+    "Cyberstrike 2026",
     "E-waste drive",
     "Tech events Mumbai",
     "Technology community",

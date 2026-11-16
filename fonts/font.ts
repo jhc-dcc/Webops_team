@@ -31,6 +31,22 @@ export const satoshi = localFont({
   variable: "--font-satoshi",
 });
 
+import { Anton, DM_Sans, Dancing_Script } from "next/font/google";
+
+export const anton = Anton({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-anton",
+  display: "swap",
+});
+
+export const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-dm",
+  display: "swap",
+});
+
 export const circular = localFont({
   src: [
     {
@@ -52,8 +68,6 @@ export const zentry = localFont({
   ],
   variable: "--font-zentry",
 });
-
-import { Dancing_Script } from "next/font/google";
 
 export const dancingScript = Dancing_Script({
   subsets: ["latin"],

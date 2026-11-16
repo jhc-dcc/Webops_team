@@ -4,10 +4,10 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = createMetadata({
   title: "Events - JHC Dot Com Club | Tech Events & Workshops",
-  description: "Discover upcoming tech events, workshops, and conferences at JHC Dot Com Club. Join Cyberstrike 2025, E-waste drives, and innovation challenges at Jai Hind College.",
+  description: "Discover upcoming tech events, workshops, and conferences at JHC Dot Com Club. Join Cyberstrike 2026, E-waste drives, and innovation challenges at Jai Hind College.",
   keywords: [
     "JHC events",
-    "Cyberstrike 2025",
+    "Cyberstrike 2026",
     "Tech workshops",
     "Programming contests",
     "E-waste drive",

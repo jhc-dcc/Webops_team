@@ -76,7 +76,7 @@
   .paavni-popup {
     width: 160px;
     right: 105%;
-    top: 12%;
+    top: -150%;
   }
 }
 
@@ -92,7 +92,7 @@
   .paavni-popup {
     width: 145px;
     right: 102%;
-    top: 10%;
+    top: -140%;
   }
 }
 

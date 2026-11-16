@@ -2,10 +2,18 @@ import { NextResponse } from 'next/server';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 
-const client = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 export async function POST(request: Request) {
   try {
+    const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+    if (!convexUrl) {
+      console.error('NEXT_PUBLIC_CONVEX_URL is not configured');
+      return NextResponse.json(
+        { success: false, error: 'Registration service is not configured' },
+        { status: 503 }
+      );
+    }
+
+    const client = new ConvexHttpClient(convexUrl);
     const body = await request.json();
     
     // Insert the registration using the existing registration mutation

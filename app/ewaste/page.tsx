@@ -56,7 +56,7 @@ export default function EwastePage() {
             <Recycle className="w-10 h-10 text-primary" />
           </div>
           <h1 className={cn("text-4xl md:text-6xl font-bold text-foreground mb-4", zentry.className)}>
-            E-WASTE <span className="text-primary">DRIVE</span> 2025
+            E-WASTE <span className="text-primary">DRIVE</span> 2026
           </h1>
           <p className={cn("text-xl text-muted-foreground max-w-3xl mx-auto", satoshi.className)}>
             Join the movement to create a sustainable future. Track the impact of our collective effort.

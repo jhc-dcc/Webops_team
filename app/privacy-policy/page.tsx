@@ -70,7 +70,7 @@ const PrivacyPolicy = () => {
             PRIVACY POLICY
           </h1>
           <p className="text-sm text-muted-foreground mb-8">
-            Last Updated: June 21, 2025
+            Last Updated: June 21, 2026
           </p>
         </motion.div>
 

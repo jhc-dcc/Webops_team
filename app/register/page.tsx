@@ -144,7 +144,7 @@ const RegisterOC = () => {
         <Card className="shadow-lg">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold text-white">
-              DCC - MEMBERSHIP 2025-26
+              DCC - MEMBERSHIP 2026-27
             </CardTitle>
             <CardDescription className="text-muted-foreground mt-2">
               Join the Dot Com Club and be part of an amazing community!
@@ -523,7 +523,7 @@ const RegisterOC = () => {
 
                 <div className="bg-amber-100 border border-amber-300 rounded-md p-4 text-amber-800 space-y-2">
                   <p>
-                    The membership fee for DCC 2025-26 is <span className="font-bold text-l">₹300</span>.
+                    The membership fee for DCC 2026-27 is <span className="font-bold text-l">₹300</span>.
                   </p>
                   <p>
                     After submitting this form, you&apos;ll be directed to our payment page to complete your registration.

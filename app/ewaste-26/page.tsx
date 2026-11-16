@@ -238,7 +238,7 @@ function PaavniMascot() {
         {isVisible && (
           <motion.div
             key={currentFact}
-            className="paavni-popup"
+            className={`paavni-popup ${isVisible ? "show" : ""}`}
             initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 15 }}
@@ -942,8 +942,8 @@ export default function EWasteDrive2026() {
         </div>
       </section>
 
-      {/* Gallery Section */}
-      <ImagesScrollingGallery images={galleryImages} />
-    </div>
+        {/* Gallery Section */}
+        <ImagesScrollingGallery images={galleryImages} />
+      </div>
   );
 }

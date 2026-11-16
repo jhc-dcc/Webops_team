@@ -6,10 +6,12 @@ import { Instagram, Linkedin, Mail, Youtube } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 // Subtle, purposeful links for DCC
 const footerNavLinks = [
   { name: "Home", href: "/" },
+  { name: "Blogs", href: "/blogs" },
   { name: "Events", href: "/events" },
   { name: "About Us", href: "/about-us" },
   { name: "Sponsors", href: "/sponsors" },
@@ -45,6 +47,17 @@ const socialLinks = [
 ];
 
 export const Footer = () => {
+  const pathname = usePathname();
+  if (
+    pathname === "/" ||
+    pathname === "/blogs" ||
+    pathname === "/about-us" ||
+    pathname === "/sponsors" ||
+    pathname === "/contact-us" ||
+    pathname === "/magazines"
+  )
+    return null;
+
   const currentYear = new Date().getFullYear();
 
   return (
@@ -114,6 +127,7 @@ export const Footer = () => {
                 <li key={link.name}>
                   <Link
                     href={link.href}
+                    prefetch={true}
                     className="group inline-flex items-center gap-2 text-sm text-neutral-300/80 hover:text-white transition-colors"
                   >
                     <span className="h-px w-0 bg-red-500/70 transition-all duration-300 group-hover:w-4"></span>

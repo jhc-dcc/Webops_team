@@ -10,7 +10,7 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/jhc-dcc.git
+   git clone https://github.com/harshtolani-34/Dcc_Website.git
    ```
 2. Navigate to the project directory:
    ```bash

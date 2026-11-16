@@ -1,509 +1,354 @@
 "use client";
 
-import { zentry } from "@/fonts/font";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { Navbar } from "@/components/home/Navbar";
+import { FooterSection } from "@/components/home/FooterSection";
+import { CustomCursor } from "@/components/home/CustomCursor";
+import { anton, dmSans } from "@/fonts/font";
 
-// Animated Background Component
-function AnimatedBackground() {
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-red-950/20 to-black"></div>
-      
-      {/* Floating particles */}
-      <div className="absolute inset-0">
-        {[...Array(50)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-red-500/30 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Gradient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-    </div>
-  );
-}
-
-// Timeline data moved outside the component for performance
-const timelineData = [
+// ── Timeline events (sticky stacked cards) ───────────────────────────────────
+const EVENTS = [
   {
+    index: 0,
+    bg: "#1B1030",
+    fg: "#F4EEFF",
     year: "2014",
+    tag: "Inception Year",
     title: "Inception Year",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHntwh4TVXK91bnH0DfmrPuAEaV8Fjq57dsiQgM",
-    description: "The DotCom Club was founded in 2014 to support IT and BVOC(SD) students, driven entirely by student initiative. From admissions support and backend management to organizing seminars and flagship events like the E-Waste Drive and Cyberstrike, this year marked the beginning of a legacy of innovation and community engagement.",
+    desc: "The DotCom Club was founded in 2014 to support IT and BVOC(SD) students, driven entirely by student initiative. From admissions support and backend management to organizing seminars and flagship events like the E‑Waste Drive and Cyberstrike, this year marked the beginning of a legacy of innovation and community engagement.",
   },
   {
+    index: 1,
+    bg: "#9E71FF",
+    fg: "#1B1030",
     year: "2019",
-    title: "E-Waste Drive",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnqHb6Tj2zFsuRWPjhtVIMZSOqr7GXwNQ61cTp",
-    description: "Our 2019 E-Waste Drive, held from September 16th to 18th, made a powerful environmental impact by collecting over 450 kg of e-waste. The event encouraged creativity with competitions like 'Best out of E-Waste' and poster-making, promoting sustainable practices and eco-awareness among students.",
+    tag: "02",
+    title: "E‑Waste Drive",
+    desc: "Our 2019 E‑Waste Drive made a powerful environmental impact by collecting over 450 kg of e-waste. The event encouraged creativity with competitions like 'Best out of E‑Waste' and poster-making, promoting sustainable practices and eco‑awareness among students.",
   },
   {
+    index: 2,
+    bg: "#fff",
+    fg: "#1B1030",
     year: "Dec 2019",
+    tag: "03",
     title: "Cyberstrike",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnh1SZrsD7wtEsA8bPRdHI0vpeYQC5JLhZul9a",
-    description: "Cyberstrike 2019 was a gaming and tech extravaganza featuring competitive matches in Battlegrounds Mobile, Call of Duty, CS:GO, FIFA 20, and Counter-Strike. The event introduced participants to cutting-edge experiences through VR technology and robotics workshops, making it a truly futuristic edition.",
+    desc: "Cyberstrike 2019 was a gaming and tech extravaganza featuring competitive matches in Battlegrounds Mobile, Call of Duty, CS:GO, FIFA 20, and Counter‑Strike. VR technology and robotics workshops made it a truly futuristic edition.",
   },
   {
+    index: 3,
+    bg: "#5A2FC0",
+    fg: "#F4EEFF",
     year: "Feb 2021",
+    tag: "04",
     title: "Virtual Cyberstrike",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnLwJo4Gt5Ba8Mi5Hfh0TCJrvp3b2t7WcgQGN1",
-    description: "Adapting to pandemic restrictions, Cyberstrike 2021 went completely virtual. Students competed online in COD Mobile, Valorant, and CS:GO, along with Chess, quizzes, Code Wars, and debates. The digital format kept the competitive and collaborative spirit alive during challenging times.",
+    desc: "Adapting to pandemic restrictions, Cyberstrike 2021 went completely virtual. Students competed online in COD Mobile, Valorant, and CS:GO, along with Chess, quizzes, Code Wars, and debates.",
   },
   {
+    index: 4,
+    bg: "#1B1030",
+    fg: "#F4EEFF",
     year: "Aug 2022",
-    title: "E-Waste Drive",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnV074vThjr5zhubXRsf38LaUvHEK7kpWOe6YC",
-    description: "Under the theme 'Revive,' this E-Waste Drive collected 306 kg of discarded electronics. The event combined environmental responsibility with fun games like Flip the Bottle, Roll the Dice, and Basketball, making sustainability engaging for all participants.",
+    tag: "05",
+    title: "E‑Waste Drive: Revive",
+    desc: "Under the theme 'Revive,' this E‑Waste Drive collected 306 kg of discarded electronics. The event combined environmental responsibility with fun games like Flip the Bottle, Roll the Dice, and Basketball.",
   },
   {
+    index: 5,
+    bg: "#9E71FF",
+    fg: "#1B1030",
     year: "Jan 2023",
+    tag: "06",
     title: "Cyberstrike: Multiversal Odyssey",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHn0uIU8OXbEg42R1FwH5tal9hqy7mszSbUfNeZ",
-    description: "Cyberstrike 2023, themed 'Multiversal Odyssey,' immersed participants in an interdimensional gaming journey with FIFA 22, Mortal Kombat, COD Mobile, and Counter-Strike tournaments. A scavenger hunt and tech competitions added excitement and diversity to this multidimensional experience.",
+    desc: "Cyberstrike 2023, themed 'Multiversal Odyssey,' immersed participants in an interdimensional gaming journey with FIFA 22, Mortal Kombat, COD Mobile, and Counter‑Strike tournaments.",
   },
   {
+    index: 6,
+    bg: "#EDE5FF",
+    fg: "#1B1030",
     year: "Aug 2023",
-    title: "E-Waste Drive",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnSsHrzwduHaOIo6ybnErgczB3sT8A521mdZlY",
-    description: "This impactful E-Waste Drive collected 341.25 kg of discarded electronics. It featured an inspiring seminar by Ms. Rashmi Joshi and an awareness drive at Churchgate Station, spreading the message of sustainability beyond the campus.",
+    tag: "07",
+    title: "E‑Waste Drive",
+    desc: "This impactful E‑Waste Drive collected 341.25 kg of discarded electronics. It featured an inspiring seminar by Ms. Rashmi Joshi and an awareness drive at Churchgate Station.",
   },
   {
+    index: 7,
+    bg: "#1B1030",
+    fg: "#F4EEFF",
     year: "Jan 2024",
+    tag: "08",
     title: "Cyberstrike: Digital Downtown",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnDEbNcuq6ZKq9mhDsy1HCxSeOL5d4PInuQWrA",
-    description: "Cyberstrike 2024 brought 'Digital Downtown' to life with an electrifying lineup of Valorant, BGMI, Mortal Kombat, and FIFA tournaments. The addition of Code Hunt and cultural showcases created a balanced blend of gaming, innovation, and creativity.",
+    desc: "Cyberstrike 2024 brought 'Digital Downtown' to life with Valorant, BGMI, Mortal Kombat, and FIFA tournaments. Code Hunt and cultural showcases created a balanced blend of gaming, innovation, and creativity.",
   },
   {
+    index: 8,
+    bg: "#9E71FF",
+    fg: "#1B1030",
     year: "Aug 2024",
-    title: "E-Waste Drive",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnpoP88YNvGfzOk3FqNQKIB68U0movL4Wur2bJ",
-    description: "A landmark edition of the E-Waste Drive, this campaign collected a record-breaking 454.25 kg of e-waste. Highlights included a thought-provoking skit, participation in the Global E-Waste Conference, and a seminar by Waste Management Services, inspiring responsible e-waste practices.",
+    tag: "09",
+    title: "E‑Waste Drive: Record",
+    desc: "A landmark edition — this campaign collected a record‑breaking 454.25 kg of e‑waste. Highlights included a thought‑provoking skit and participation in the Global E‑Waste Conference.",
   },
   {
+    index: 9,
+    bg: "#5A2FC0",
+    fg: "#F4EEFF",
     year: "Jan 2025",
+    tag: "10",
     title: "Cyberstrike: Genesis & Exodus",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnBr41M4QDxrEAPiKm0JunjBMbytZqcvdW83gG",
-    description: "Cyberstrike 2025 embraced the transformative theme 'Genesis & Exodus,' symbolizing growth and change. With esports battles, a high-energy hackathon, vibrant cultural showcases, and an immersive escape room challenge, this edition delivered an unforgettable mix of creativity and competition.",
+    desc: "Cyberstrike 2025 embraced the transformative theme 'Genesis & Exodus,' with esports battles, a high‑energy hackathon, vibrant cultural showcases, and an immersive escape room challenge.",
   },
   {
+    index: 10,
+    bg: "#fff",
+    fg: "#1B1030",
     year: "Mar 2025",
-    title: "Tech-Surjan 2025",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnEMmZ7v0c7VZq0a2v8pPiynTuLfHO69gJsWtS",
-    description: "Tech-Surjan 2025 brought together innovation and entrepreneurship with an intercollegiate exhibition of operational projects, groundbreaking research papers, creative poster presentations, and ambitious startup pitches, fostering a culture of innovation.",
+    tag: "11",
+    title: "Tech‑Surjan 2025",
+    desc: "Tech‑Surjan 2025 brought together innovation and entrepreneurship with an intercollegiate exhibition of operational projects, research papers, poster presentations, and startup pitches.",
   },
   {
+    index: 11,
+    bg: "#1B1030",
+    fg: "#9E71FF",
     year: "July 2025",
-    title: "E-Waste Drive",
-    image: "https://0wcouur2ua.ufs.sh/f/aRfYxWK0MkHnd3RFIksKPl6IUv1HWzAVsEdC935ahDBwYLZ7",
-    description: "A landmark edition of the E-Waste Drive, this campaign collected a record-breaking 2 tons of e-waste. Highlights included a thought-provoking skit, participation in the Global E-Waste Conference, and a seminar by Waste Management Services, inspiring responsible e-waste practices.",
+    tag: "12",
+    title: "E‑Waste Drive: 2 Tons",
+    desc: "A landmark edition of the E‑Waste Drive — this campaign collected a record‑breaking 2 tons of e‑waste. Highlights included a thought‑provoking skit and a seminar by Waste Management Services.",
   },
 ];
 
-function Timeline() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isRotating, setIsRotating] = useState(false);
-  const timelineLength = timelineData.length;
-
-  // Auto-rotate timeline with rotation animation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsRotating(true);
-      setTimeout(() => {
-        setActiveIndex((prev) => {
-          const nextIndex = (prev + 1) % timelineLength;
-          setIsRotating(false);
-          return nextIndex;
-        });
-      }, 500);
-    }, 6000); 
-    return () => clearInterval(interval);
-  }, [timelineLength]);
-
-  const handleNavigation = (newIndex: number) => {
-    if (newIndex !== activeIndex && !isRotating) {
-      setIsRotating(true);
-      setTimeout(() => {
-        setActiveIndex(newIndex);
-        setIsRotating(false);
-      }, 500);
-    }
-  };
-
-  return (
-    <>
-      <style jsx>{`
-        .cube-container {
-          perspective: 1200px;
-          transform-style: preserve-3d;
-        }
-        
-        .cube {
-          width: 100%;
-          max-width: 350px;
-          height: 280px;
-          position: relative;
-          transform-style: preserve-3d;
-          transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
-          margin: 0 auto;
-        }
-        
-        .cube.rotating {
-          transform: rotateY(90deg);
-        }
-        
-        .cube-face {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          border: 2px solid rgba(239, 68, 68, 0.3);
-          border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .cube-face-front { transform: rotateY(0deg) translateZ(175px); }
-        .cube-face-right { transform: rotateY(90deg) translateZ(175px); }
-        .cube-face-back { transform: rotateY(180deg) translateZ(175px); }
-        .cube-face-left { transform: rotateY(-90deg) translateZ(175px); }
-        .cube-face-top { transform: rotateX(90deg) translateZ(140px); }
-        .cube-face-bottom { transform: rotateX(-90deg) translateZ(140px); }
-        
-        .timeline-dots {
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-        
-        .timeline-dot {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          border: 2px solid rgba(239, 68, 68, 0.3);
-          cursor: pointer;
-          transition: all 0.3s ease;
-          position: relative;
-        }
-        
-        .timeline-dot.active {
-          background: #ef4444;
-          border-color: #ef4444;
-          transform: scale(1.2);
-        }
-        
-        .timeline-dot:hover {
-          border-color: #ef4444;
-          transform: scale(1.1);
-        }
-
-        @media (max-width: 768px) {
-          .cube {
-            max-width: 280px;
-            height: 220px;
-          }
-          
-          .cube-face-front { transform: rotateY(0deg) translateZ(140px); }
-          .cube-face-right { transform: rotateY(90deg) translateZ(140px); }
-          .cube-face-back { transform: rotateY(180deg) translateZ(140px); }
-          .cube-face-left { transform: rotateY(-90deg) translateZ(140px); }
-          .cube-face-top { transform: rotateX(90deg) translateZ(110px); }
-          .cube-face-bottom { transform: rotateX(-90deg) translateZ(110px); }
-        }
-
-        @media (max-width: 480px) {
-          .cube {
-            max-width: 250px;
-            height: 200px;
-          }
-          
-          .cube-face-front { transform: rotateY(0deg) translateZ(125px); }
-          .cube-face-right { transform: rotateY(90deg) translateZ(125px); }
-          .cube-face-back { transform: rotateY(180deg) translateZ(125px); }
-          .cube-face-left { transform: rotateY(-90deg) translateZ(125px); }
-          .cube-face-top { transform: rotateX(90deg) translateZ(100px); }
-          .cube-face-bottom { transform: rotateX(-90deg) translateZ(100px); }
-        }
-      `}</style>
-
-      <section className="mb-24">
-        <div className="text-center mb-12">
-          <h2 className={cn("text-4xl md:text-6xl font-bold mb-6 text-red-500", zentry.className)}>
-            OUR JOURNEY
-          </h2>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
-            Explore our innovation journey
-          </p>
-          <div className="w-16 h-1 bg-red-500 mx-auto mt-4"></div>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4">
-          
-          {/* 3D Rotating Cube - Centered */}
-          <div className="mb-12">
-            <div className="cube-container">
-              <div className={cn("cube", isRotating && "rotating")}> 
-                {/* Front face */}
-                <div className="cube-face cube-face-front">
-                  <Image
-                    src={timelineData[activeIndex].image}
-                    alt={timelineData[activeIndex].title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 280px, 350px"
-                    onError={(e) => {
-                      console.log(`Failed to load image: ${timelineData[activeIndex].image}`);
-                      // Set a fallback image if the original fails
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/images/fallback-event.jpg';
-                    }}
-                    placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold inline-block mb-2">
-                      {timelineData[activeIndex].year}
-                    </div>
-                  </div>
-                </div>
-                {/* Other faces with different images */}
-                {[1, 2, 3, 4, 5].map((offset, index) => {
-                  if (timelineData.length < 2) return null;
-                  const imageIndex = (activeIndex + offset) % timelineData.length;
-                  const faceClasses = [
-                    'cube-face-right',
-                    'cube-face-back', 
-                    'cube-face-left',
-                    'cube-face-top',
-                    'cube-face-bottom'
-                  ];
-                  return (
-                    <div key={index} className={`cube-face ${faceClasses[index]}`}>
-                      <Image
-                        src={timelineData[imageIndex].image}
-                        alt={timelineData[imageIndex].title}
-                        fill
-                        className="object-cover opacity-60"
-                        sizes="(max-width: 768px) 280px, 350px"
-                        onError={(e) => {
-                          console.log(`Failed to load image: ${timelineData[imageIndex].image}`);
-                          const target = e.target as HTMLImageElement;
-                          target.src = '/images/fallback-event.jpg';
-                        }}
-                        placeholder="blur"
-                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                      />
-                      <div className="absolute inset-0 bg-black/60"></div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Event Details Card - Below Cube */}
-          <div className="max-w-4x4 mx-auto mb-8">
-            <div className="bg-black/60 backdrop-blur-xl border border-red-500/30 rounded-2xl p-6 md:p-8 shadow-2xl">
-              
-              {/* Event Header */}
-              <div className="text-center mb-6">
-                <div className="flex items-center justify-center gap-4 mb-4">
-                  <div className="bg-red-500 text-white px-6 py-2 rounded-full font-bold text-xl">
-                    {timelineData[activeIndex].year}
-                  </div>
-                </div>
-                
-                <h3 className={cn("text-2xl md:text-4xl font-bold text-white mb-4", zentry.className)}>
-                  {timelineData[activeIndex].title}
-                </h3>
-              </div>
-              
-              <p className="text-gray-300 text-lg leading-relaxed mb-6 text-center max-w-3xl mx-auto">
-                {timelineData[activeIndex].description}
-              </p>
-
-              {/* Progress Bar */}
-              <div className="mb-6">
-                <div className="flex justify-between text-xs text-gray-400 mb-2">
-                  <span>Timeline Progress</span>
-                  <span>{activeIndex + 1} / {timelineData.length}</span>
-                </div>
-                <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-red-500 to-orange-500 transition-all duration-500 rounded-full"
-                    style={{ width: `${((activeIndex + 1) / timelineData.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Timeline Navigation Dots */}
-          <div className="mb-8">
-            <div className="timeline-dots" role="tablist" aria-label="Timeline navigation">
-              {timelineData.map((item, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleNavigation(index)}
-                  className={cn(
-                    "timeline-dot",
-                    index === activeIndex && "active"
-                  )}
-                  aria-label={`${item.year} - ${item.title}`}
-                  aria-selected={index === activeIndex}
-                  role="tab"
-                  tabIndex={index === activeIndex ? 0 : -1}
-                  title={`${item.year} - ${item.title}`}
-                  disabled={isRotating}
-                />
-              ))}
-            </div>
-          </div>
-
- 
-
-          {/* Navigation Controls */}
-          
-        </div>
-      </section>
-    </>
-  );
-}
+const MARQUEE_WORDS = [
+  "Creativity",
+  "Collaboration",
+  "Cutting‑edge Technology",
+  "Student‑led",
+  "Cyberstrike",
+];
 
 export default function AboutPage() {
-  const heroRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [activeCard, setActiveCard] = useState(1);
 
   useEffect(() => {
-    // Scroll animations
-    const observer = new IntersectionObserver(
+    const timer = setTimeout(() => setIsLoaded(true), 60);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Scroll-based nav theme + card progress tracker + heading reveals
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const nav = document.querySelector<HTMLElement>("nav");
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>("header,section,footer")
+    );
+    const cards = Array.from(
+      document.querySelectorAll<HTMLElement>(".ev")
+    );
+    const pgLabel = document.getElementById("pgt");
+    const pgBar = document.getElementById("pgb");
+
+    // Heading reveals
+    const revealEls = document.querySelectorAll(".rv");
+    const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in-up');
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.4 }
     );
+    revealEls.forEach((el) => io.observe(el));
 
-    document.querySelectorAll('.animate-on-scroll').forEach((el) => {
-      observer.observe(el);
-    });
+    let lastY = 0;
+    const onScroll = () => {
+      if (!nav) return;
+      const y = window.scrollY;
+      const diff = y - lastY;
+      nav.classList.toggle("at", y < 24);
+      if (Math.abs(diff) > 6) {
+        nav.classList.toggle("hide", diff > 0 && y > 220);
+        lastY = y;
+      }
+      // section colour
+      let t = "d";
+      sections.forEach((s) => {
+        const r = s.getBoundingClientRect();
+        if (r.top <= 32 && r.bottom > 32) {
+          if (s.matches(".hero")) t = "p";
+          else if (s.matches(".jr")) t = "l";
+          else t = "d";
+        }
+      });
+      if (nav) nav.dataset.t = t;
 
-    return () => observer.disconnect();
-  }, []);
+      // Card progress
+      let n = 1;
+      cards.forEach((c, k) => {
+        if (c.getBoundingClientRect().top < window.innerHeight * 0.55) n = k + 1;
+      });
+      setActiveCard(n);
+      if (pgLabel) pgLabel.textContent = `${n} / ${cards.length}`;
+      if (pgBar) pgBar.style.setProperty("--w", `${(n / cards.length) * 100}%`);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [isLoaded]);
 
   return (
-    <>
-      <style jsx global>{`
-        .animate-fade-in-up {
-          animation: fadeInUp 0.6s ease-out forwards;
-        }
+    <div
+      className={`about-root home-root ${isLoaded ? "go" : ""} ${anton.variable} ${dmSans.variable}`}
+    >
+      <Navbar />
+      <CustomCursor />
 
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+      {/* FAB – mobile floating button */}
+      <a className="fab btn wh" href="#timeline" id="fab">
+        Our Journey
+      </a>
 
-      <div className="min-h-screen bg-black text-white overflow-hidden">
-        {/* Hero Section */}
-        <section ref={heroRef} className="relative min-h-screen flex items-center justify-center">
-          <AnimatedBackground />
-          
-          <div className="relative z-10 max-w-7xl mx-auto px-4 text-center">
-            <div className="animate-on-scroll opacity-0">
-              <h1 className={cn(
-                "text-5xl md:text-7xl lg:text-8xl font-bold mb-8",
-                zentry.className
-              )}>
-                About <span className="text-red-500">DCC</span>
-              </h1>
-              
-              <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-                Empowering the next generation of tech innovators through creativity, 
-                collaboration, and cutting-edge technology at Jai Hind College.
-              </p>
+      {/* ── HERO ─────────────────────────────────────────────────── */}
+      <header className="hero" id="hero">
+        {/* Rotating badge */}
+        <svg className="bdg" viewBox="0 0 200 200" aria-hidden="true">
+          <defs>
+            <path id="cp" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
+          </defs>
+          <text fontSize="19" fontWeight="700" fill="#1B1030" fontFamily="DM Sans,sans-serif">
+            <textPath href="#cp" textLength="480" lengthAdjust="spacing">
+              JAI HIND COLLEGE • EST. 2014 • TECH CLUB •
+            </textPath>
+          </text>
+          <circle cx="100" cy="100" r="14" fill="#1B1030" />
+        </svg>
 
-              <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                <Link
-                  href="#mission"
-                  className="px-8 py-4 bg-red-600 hover:bg-red-700 rounded-full font-semibold transition-all duration-300 hover:scale-105 shadow-lg shadow-red-500/25"
-                >
-                  Our Mission
-                </Link>
-                <Link
-                  href="#timeline"
-                  className="px-8 py-4 border-2 border-red-500 hover:bg-red-500 rounded-full font-semibold transition-all duration-300 hover:scale-105"
-                >
-                  Our Journey
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Scroll Indicator */}
-              
-        </section>
-
-        {/* Main Content */}
-        <div className="relative">
-          <AnimatedBackground />
-          
-          <div className="relative z-10 max-w-7xl mx-auto px-4 py-24">
-            {/* Mission Section */}
-            <section id="mission" className="animate-on-scroll opacity-0 mb-24">
-              <div className="max-w-5xl mx-auto">
-                <div className="bg-black/70 border-2 border-red-500 rounded-2xl p-10 shadow-lg">
-                  <h2 className={cn("text-4xl md:text-5xl font-bold mb-8 text-white text-center", zentry.className)}>
-                    Our <span className="text-red-500">Mission</span>
-                  </h2>
-                  <div className="space-y-6 text-lg text-gray-300 leading-relaxed text-left">
-                    <p>
-                      The BSc IT and BVoc Software Development departments
-                      of Jai Hind College are dedicated to shaping young minds into
-                      future-ready computer professionals through a robust curriculum and dynamic co-curricular activities.
-                    </p>
-                    <p>
-                      The <strong className="text-red-400">DOT COM CLUB</strong>, the official club of the IT and BVoc SD departments,
-                      is a club by the students and for the students. A new student committee
-                      is elected each year, encouraging active participation and fostering leadership, creativity, and collaboration.
-                    </p>
-                    <p>
-                      We organize orientations in fun and informative ways that encourage freshers and give them and their
-                      parents a clear understanding of department life. Our annual tech fest <span className="text-white">Cyberstrike </span>
-                      has become a landmark event in the college calendar.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Timeline Section */}
-            <section id="timeline" className="animate-on-scroll opacity-0">
-              <Timeline />
-            </section>
+        <div className="wrap">
+          <h1 className="h1 au-h1" aria-label="About DCC">
+            <s><i>About</i></s>
+            <s><i>DCC<span className="od" aria-hidden="true" /></i></s>
+          </h1>
+          <div className="c2">
+            <p>
+              Empowering the next generation of tech innovators through creativity,
+              collaboration, and cutting‑edge technology at Jai Hind College.
+            </p>
+            <a className="btn dk" href="#mission">Our Mission</a>
+            <a className="btn ol" href="#timeline" style={{ marginLeft: 8 }}>Our Journey</a>
           </div>
         </div>
-      </div>
-    </>
+
+        {/* Marquee tapes */}
+        <div className="tp t1" aria-hidden="true">
+          <div className="mq">
+            {[...Array(2)].flatMap((_, i) =>
+              MARQUEE_WORDS.map((w, j) => (
+                <span key={`${i}-${j}`}>{w}<span style={{ margin: "0 18px" }}>●</span></span>
+              ))
+            )}
+          </div>
+        </div>
+        <div className="tp t2" aria-hidden="true">
+          <div className="mq" style={{ animationDirection: "reverse" }}>
+            {[...Array(2)].flatMap((_, i) =>
+              MARQUEE_WORDS.map((w, j) => (
+                <span key={`${i}-${j}`}>{w}<span style={{ margin: "0 18px" }}>●</span></span>
+              ))
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* ── MISSION ──────────────────────────────────────────────── */}
+      <section className="mis" id="mission">
+        <div className="wrap">
+          <h2 className="hd rv">Our Mission</h2>
+          <div className="mg">
+            <div className="mc">
+              <b className="n">01</b>
+              <p>
+                The BSc IT and BVoc Software Development departments of Jai Hind
+                College are dedicated to shaping young minds into future‑ready
+                computer professionals through a robust curriculum and dynamic
+                co‑curricular activities.
+              </p>
+            </div>
+            <div className="mc">
+              <b className="n">02</b>
+              <p>
+                The <strong>DOT COM CLUB</strong>, the official club of the IT
+                and BVoc SD departments, is a club by the students and for the
+                students. A new student committee is elected each year,
+                encouraging active participation and fostering leadership,
+                creativity, and collaboration.
+              </p>
+            </div>
+            <div className="mc">
+              <b className="n">03</b>
+              <p>
+                We organize orientations in fun and informative ways that
+                encourage freshers and give them and their parents a clear
+                understanding of department life. Our annual tech fest{" "}
+                <strong>Cyberstrike</strong> has become a landmark event in the
+                college calendar.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── JOURNEY (sticky stacked cards) ───────────────────────── */}
+      <section className="jr" id="timeline">
+        <div className="wrap">
+          <h2 className="hd rv">Our Journey</h2>
+          <p className="lead">Explore our innovation journey</p>
+
+          {/* Progress bar */}
+          <div className="pg" aria-hidden="true">
+            <span id="pgt">1 / {EVENTS.length}</span>
+            <u id="pgb" />
+          </div>
+
+          {/* Stacked sticky cards */}
+          <div id="stack">
+            {EVENTS.map((ev) => (
+              <article
+                key={ev.index}
+                className="ev"
+                style={
+                  {
+                    "--i": ev.index,
+                    "--b": ev.bg,
+                    "--f": ev.fg,
+                  } as React.CSSProperties
+                }
+              >
+                <div className="tr">
+                  <span>Timeline</span>
+                  <span className="tg">{ev.tag}</span>
+                </div>
+                <div>
+                  <div className="yr">{ev.year}</div>
+                  <h3>{ev.title}</h3>
+                  <p>{ev.desc}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER (same as /blogs) ───────────────────────────────── */}
+      <FooterSection />
+    </div>
   );
 }

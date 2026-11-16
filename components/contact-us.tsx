@@ -470,8 +470,10 @@ export default function ContactPage() {
                     <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-destructive mt-1 group-hover:scale-110 transition-transform flex-shrink-0" />
                     <div>
                       <h3 className="text-destructive font-semibold mb-1 font-mono text-sm sm:text-base">{">"} PHONE</h3>
-                      <p className="text-foreground font-mono text-xs sm:text-sm">Sahil Manoj Modi</p>
-                      <p className="text-foreground font-mono text-xs sm:text-sm">+91 81087 16051</p>
+                      <p className="text-foreground font-mono text-xs sm:text-sm">Hussain Tinwala</p>
+                      <p className="text-foreground font-mono text-xs sm:text-sm">+91 9867069971</p>
+                      <p className="text-foreground font-mono text-xs sm:text-sm">Bhalchandra</p>
+                      <p className="text-foreground font-mono text-xs sm:text-sm">+91 9152854203</p>
                     </div>
                   </div>
                 </div>
@@ -533,7 +535,7 @@ export default function ContactPage() {
             <span>{">"} Connection: <span className="text-green-400">ENCRYPTED</span></span>
           </div>
           <div className="mt-2 text-xs opacity-60 text-green-400/60">
-            DCC Terminal Interface © 2025 | All transmissions secured
+            DCC Terminal Interface © 2026 | All transmissions secured
           </div>
         </div>
       </div>

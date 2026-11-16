@@ -23,7 +23,7 @@ export function generateOrganizationSchema() {
     sameAs: ["https://www.jhcdotcomclub.com"],
     event: {
       "@type": "Event",
-      name: "Cyberstrike 2025",
+      name: "Cyberstrike 2026",
       organizer: {
         "@type": "Organization",
         name: "JHC Dot Com Club",

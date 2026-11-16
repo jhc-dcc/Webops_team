@@ -1,615 +1,832 @@
 "use client";
 
-import SponsorCarousel from "@/components/ui/sponsor-carousel";
-import ParticleBackground from "@/components/ui/particle-background";
-import PageAnimatedGradient from "@/components/ui/page-animated-gradient";
-import WaveAnimation from "@/components/ui/wave-animation";
-import AnimatedHeader from "@/components/ui/animated-header";
-import { cn } from "@/lib/utils";
-import { zentry, satoshi } from "@/fonts/font";
-import Link from "next/link";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Astronaut } from "@/components/Astronaut";
-import { Float } from "@react-three/drei";
-import { useMediaQuery } from "react-responsive";
-import { easing } from "maath";
-import { Suspense, useState, useEffect, useMemo, useCallback } from "react";
-import Loader from "@/components/Loader";
+import { useEffect, useRef, useState, useCallback } from "react";
+import Image from "next/image";
+import { Navbar } from "@/components/home/Navbar";
+import { FooterSection } from "@/components/home/FooterSection";
+import { CustomCursor } from "@/components/home/CustomCursor";
+import { anton, dmSans } from "@/fonts/font";
 
-const sponsorRowsData24 = [
-  [
-    {
-      id: "s1",
-      src: "/2024/Sponsor01.webp",
-      alt: "Sponsor Alpha",
-      hint: "Dreq",
-    },
-    {
-      id: "s2",
-      src: "/2024/Sponsor02.png",
-      alt: "Sponsor Beta",
-      hint: "The Pastel Castle",
-    },
-    {
-      id: "s3",
-      src: "/2024/Sponsor03.png",
-      alt: "Sponsor Gamma",
-      hint: "Archies Table",
-    },
-    {
-      id: "s4",
-      src: "/2024/Sponsor04.jpg",
-      alt: "Sponsor Delta",
-      hint: "Big Scoop Cafe",
-    },
-    {
-      id: "s5",
-      src: "/2024/Sponsor05.png",
-      alt: "Sponsor Epsilon",
-      hint: "Art Esthetique",
-    },
-    {
-      id: "s6",
-      src: "/2024/Sponsor06.jpeg",
-      alt: "Sponsor Zeta",
-      hint: "Bora Haely",
-    },
-  ],
-  [
-    {
-      id: "s7",
-      src: "/2024/Sponsor07.jpeg",
-      alt: "Sponsor Eta",
-      hint: "Cafe 2.o",
-    },
-    {
-      id: "s8",
-      src: "/2024/Sponsor08.jpeg",
-      alt: "Sponsor Theta",
-      hint: "Bounce INC",
-    },
-    {
-      id: "s9",
-      src: "/2024/Sponsor09.png",
-      alt: "Sponsor Iota",
-      hint: "Cane Juice",
-    },
-    {
-      id: "s10",
-      src: "/2024/Sponsor10.webp",
-      alt: "Sponsor Kappa",
-      hint: "Carnival Cinemas",
-    },
-    {
-      id: "s11",
-      src: "/2024/Sponsor11.jpg",
-      alt: "Sponsor Lambda",
-      hint: "Mind Faces",
-    },
-    {
-      id: "s12",
-      src: "/2024/Sponsor12.jpeg",
-      alt: "Sponsor Mu",
-      hint: "Chatore",
-    },
-  ],
-  [
-    {
-      id: "s13",
-      src: "/2024/Sponsor13.png",
-      alt: "Sponsor Nu",
-      hint: "Coding Blocks",
-    },
-    {
-      id: "s14",
-      src: "/2024/Sponsor14.jpg",
-      alt: "Sponsor Xi",
-      hint: "College Rivals",
-    },
-    {
-      id: "s15",
-      src: "/2024/Sponsor15.jpg",
-      alt: "Sponsor Omicron",
-      hint: "YouTube FanFest",
-    },
-    {
-      id: "s16",
-      src: "/2024/Sponsor16.jpeg",
-      alt: "Sponsor Pi",
-      hint: "Zero Degree Gelato",
-    },
-    {
-      id: "s17",
-      src: "/2024/Sponsor17.png",
-      alt: "Sponsor Rho",
-      hint: "Gamer's Retreat",
-    },
-    {
-      id: "s18",
-      src: "/2024/Sponsor18.png",
-      alt: "Sponsor Sigma",
-      hint: "Heli CupCakes",
-    },
-  ],
-  [
-    {
-      id: "s22",
-      src: "/2024/Sponsor22.png",
-      alt: "Sponsor Alpha",
-      hint: "Chip'n Dip",
-    },
-    {
-      id: "s23",
-      src: "/2024/Sponsor23.jpeg",
-      alt: "Sponsor Beta",
-      hint: "Kalopsia",
-    },
-    {
-      id: "s24",
-      src: "/2024/Sponsor24.png",
-      alt: "Sponsor Gamma",
-      hint: "KIKXX",
-    },
-    {
-      id: "s25",
-      src: "/2024/Sponsor25.jpg",
-      alt: "Sponsor Delta",
-      hint: "Makeonit",
-    },
-    {
-      id: "s26",
-      src: "/2024/Sponsor26.jpg",
-      alt: "Sponsor Epsilon",
-      hint: "Mini Map",
-    },
-    {
-      id: "s27",
-      src: "/2024/Sponsor27.png",
-      alt: "Sponsor Zeta",
-      hint: "Mona Lisa",
-    },
-  ],
-  [
-    {
-      id: "s29",
-      src: "/2024/Sponsor29.jpeg",
-      alt: "Sponsor Alpha",
-      hint: "Mukesh Metal",
-    },
-    {
-      id: "s30",
-      src: "/2024/Sponsor30.png",
-      alt: "Sponsor Beta",
-      hint: "Nitya Yadav",
-    },
-    {
-      id: "s31",
-      src: "/2024/Sponsor31.webp",
-      alt: "Sponsor Gamma",
-      hint: "No Escape",
-    },
-    {
-      id: "s32",
-      src: "/2024/Sponsor32.png",
-      alt: "Sponsor Delta",
-      hint: "Nutorio",
-    },
-    {
-      id: "s33",
-      src: "/2024/Sponsor33.png",
-      alt: "Sponsor Epsilon",
-      hint: "Peculiar Photobooths",
-    },
-    {
-      id: "s34",
-      src: "/2024/Sponsor34.jpeg",
-      alt: "Sponsor Zeta",
-      hint: "The Pilot.in",
-    },
-  ],
-  [
-    {
-      id: "s36",
-      src: "/2024/Sponsor36.png",
-      alt: "Sponsor Alpha",
-      hint: "The Ranch",
-    },
-    {
-      id: "s37",
-      src: "/2024/Sponsor37.jpeg",
-      alt: "Sponsor Beta",
-      hint: "Red Bull",
-    },
-    {
-      id: "s38",
-      src: "/2024/Sponsor38.png",
-      alt: "Sponsor Gamma",
-      hint: "Rio",
-    },
-    {
-      id: "s39",
-      src: "/2024/Sponsor39.png",
-      alt: "Sponsor Delta",
-      hint: "Sagar",
-    },
-    {
-      id: "s40",
-      src: "/2024/Sponsor40.png",
-      alt: "Sponsor Epsilon",
-      hint: "Seasons",
-    },
-    {
-      id: "s41",
-      src: "/2024/Sponsor41.png",
-      alt: "Sponsor Zeta",
-      hint: "SMAAASH",
-    },
-  ],
-  [
-    {
-      id: "s43",
-      src: "/2024/Sponsor43.webp",
-      alt: "Sponsor Alpha",
-      hint: "Suffderma",
-    },
-    {
-      id: "s44",
-      src: "/2024/Sponsor44.jpeg",
-      alt: "Sponsor Beta",
-      hint: "Zero Degrees",
-    },
-    {
-      id: "s45",
-      src: "/2024/Sponsor45.jpg",
-      alt: "Sponsor Gamma",
-      hint: "Zero Latency",
-    },
-    {
-      id: "s19",
-      src: "/2024/Sponsor19.png",
-      alt: "Sponsor Delta",
-      hint: "Omen",
-    },
-    {
-      id: "s20",
-      src: "/2024/Sponsor20.png",
-      alt: "Sponsor Epsilon",
-      hint: "iCover Creations",
-    },
-    {
-      id: "s21",
-      src: "/2024/Sponsor21.jpeg",
-      alt: "Sponsor Zeta",
-      hint: "The J",
-    },
-  ],
-  [
-    {
-      id: "s35",
-      src: "/2024/Sponsor35.jpeg",
-      alt: "Sponsor Zeta",
-      hint: "education platform",
-    },
-    {
-      id: "s42",
-      src: "/2024/Sponsor42.png",
-      alt: "Sponsor Zeta",
-      hint: "SportsQVest",
-    },
-    {
-      id: "s28",
-      src: "/2024/Sponsor28.avif",
-      alt: "Sponsor Zeta",
-      hint: "Moody Girl",
-    },
-  ],
-];
-
-const sponsorRowsData25 = [
-  [
-    {
-      id: "s001",
-      src: "/2025/Sp01.png",
-      alt: "Sponsor Alpha",
-      hint: "Alpha Juice",
-    },
-    {
-      id: "s002",
-      src: "/2025/Sp02.png",
-      alt: "Sponsor Beta",
-      hint: "Amity University",
-    },
-    {
-      id: "s003",
-      src: "/2025/Sp03.png",
-      alt: "Sponsor Gamma",
-      hint: "HelitHubs.com",
-    },
-    {
-      id: "s004",
-      src: "/2025/Sp04.jpeg",
-      alt: "Sponsor Delta",
-      hint: "The Waffle Wings",
-    },
-    {
-      id: "s005",
-      src: "/2025/Sp05.png",
-      alt: "Sponsor Epsilon",
-      hint: "Amara & Co.",
-    },
-    {
-      id: "s006",
-      src: "/2025/Sp06.jpeg",
-      alt: "Sponsor Zeta",
-      hint: "Aesthetically Crystals",
-    },
-  ],
-  [
-    {
-      id: "s007",
-      src: "/2025/Sp07.jpeg",
-      alt: "Sponsor Eta",
-      hint: "Mac Bites",
-    },
-    {
-      id: "s008",
-      src: "/2025/Sp08.jpeg",
-      alt: "Sponsor Theta",
-      hint: "Miya Kebabs",
-    },
-    {
-      id: "s009",
-      src: "/2025/Sp09.jpg",
-      alt: "Sponsor Iota",
-      hint: "Parabolica Social Gaming",
-    },
-    {
-      id: "s010",
-      src: "/2025/Sp10.jpeg",
-      alt: "Sponsor Kappa",
-      hint: "Red Bubble Cafe",
-    },
-    {
-      id: "s011",
-      src: "/2025/Sp11.jpeg",
-      alt: "Sponsor Lambda",
-      hint: "Luna- Simply Moonstruck",
-    },
-    {
-      id: "s012",
-      src: "/2025/Sp12.jpg",
-      alt: "Sponsor Mu",
-      hint: "Youtube FanFest",
-    },
-  ],
-];
-
-// Rig component for camera movement
-function Rig() {
-  return useFrame((state, delta) => {
-    easing.damp3(
-      state.camera.position,
-      [state.mouse.x / 10, 1 + state.mouse.y / 10, 3],
-      0.5,
-      delta
-    );
-  });
+interface SponsorItem {
+  id: string;
+  name: string;
+  urlPath: string;
+  logo: string;
+  category?: string;
 }
 
-// Custom Hero Component for Sponsors Page
-const SponsorsHero = () => {
-  const [isMounted, setIsMounted] = useState(false);
-  const isMobile = useMediaQuery({ maxWidth: 853 });
+const TITLE_SPONSOR: SponsorItem = {
+  id: "title-1",
+  name: "Red Bull",
+  urlPath: "cyberstrike.dcc/redbull",
+  logo: "/2024/Sponsor37.jpeg",
+  category: "Headline Title Partner",
+};
+
+const POWERED_BY: SponsorItem[] = [
+  {
+    id: "pwr-1",
+    name: "Omen by HP",
+    urlPath: "cyberstrike.dcc/omen",
+    logo: "/2024/Sponsor19.png",
+    category: "Gaming Tech Partner",
+  },
+  {
+    id: "pwr-2",
+    name: "YouTube FanFest",
+    urlPath: "cyberstrike.dcc/yt-fanfest",
+    logo: "/2024/Sponsor15.jpg",
+    category: "Digital Media Partner",
+  },
+];
+
+const ASSOCIATE_SPONSORS: SponsorItem[] = [
+  {
+    id: "asc-1",
+    name: "Coding Blocks",
+    urlPath: "cyberstrike.dcc/coding-blocks",
+    logo: "/2024/Sponsor13.png",
+    category: "EdTech Partner",
+  },
+  {
+    id: "asc-2",
+    name: "College Rivals",
+    urlPath: "cyberstrike.dcc/college-rivals",
+    logo: "/2024/Sponsor14.jpg",
+    category: "Esports Arena Partner",
+  },
+  {
+    id: "asc-3",
+    name: "SMAAASH",
+    urlPath: "cyberstrike.dcc/smaaash",
+    logo: "/2024/Sponsor41.png",
+    category: "Entertainment Partner",
+  },
+  {
+    id: "asc-4",
+    name: "Zero Latency",
+    urlPath: "cyberstrike.dcc/zero-latency",
+    logo: "/2024/Sponsor45.jpg",
+    category: "VR Gaming Partner",
+  },
+];
+
+const PARTNERS: SponsorItem[] = [
+  {
+    id: "prt-1",
+    name: "Amity University",
+    urlPath: "cyberstrike.dcc/amity",
+    logo: "/2025/Sp02.png",
+    category: "Academic Partner",
+  },
+  {
+    id: "prt-2",
+    name: "Carnival Cinemas",
+    urlPath: "cyberstrike.dcc/carnival-cinemas",
+    logo: "/2024/Sponsor10.webp",
+    category: "Entertainment Partner",
+  },
+  {
+    id: "prt-3",
+    name: "Bounce INC",
+    urlPath: "cyberstrike.dcc/bounce-inc",
+    logo: "/2024/Sponsor08.jpeg",
+    category: "Activity Partner",
+  },
+  {
+    id: "prt-4",
+    name: "The J",
+    urlPath: "cyberstrike.dcc/the-j",
+    logo: "/2024/Sponsor21.jpeg",
+    category: "F&B Partner",
+  },
+  {
+    id: "prt-5",
+    name: "Gamer's Retreat",
+    urlPath: "cyberstrike.dcc/gamers-retreat",
+    logo: "/2024/Sponsor17.png",
+    category: "Esports Partner",
+  },
+  {
+    id: "prt-6",
+    name: "Parabolica",
+    urlPath: "cyberstrike.dcc/parabolica",
+    logo: "/2025/Sp09.jpg",
+    category: "Social Gaming",
+  },
+  {
+    id: "prt-7",
+    name: "No Escape",
+    urlPath: "cyberstrike.dcc/no-escape",
+    logo: "/2024/Sponsor31.webp",
+    category: "Mystery Partner",
+  },
+  {
+    id: "prt-8",
+    name: "SportsQVest",
+    urlPath: "cyberstrike.dcc/sports-qvest",
+    logo: "/2024/Sponsor42.png",
+    category: "Merch Partner",
+  },
+  {
+    id: "prt-9",
+    name: "Big Scoop Cafe",
+    urlPath: "cyberstrike.dcc/big-scoop",
+    logo: "/2024/Sponsor04.jpg",
+    category: "Hospitality Partner",
+  },
+  {
+    id: "prt-10",
+    name: "Rio",
+    urlPath: "cyberstrike.dcc/rio",
+    logo: "/2024/Sponsor38.png",
+    category: "Beverage Partner",
+  },
+  {
+    id: "prt-11",
+    name: "The Ranch",
+    urlPath: "cyberstrike.dcc/the-ranch",
+    logo: "/2024/Sponsor36.png",
+    category: "Youth Partner",
+  },
+  {
+    id: "prt-12",
+    name: "Chip'n Dip",
+    urlPath: "cyberstrike.dcc/chip-n-dip",
+    logo: "/2024/Sponsor22.png",
+    category: "Snacks Partner",
+  },
+  {
+    id: "prt-13",
+    name: "Peculiar Photobooths",
+    urlPath: "cyberstrike.dcc/peculiar-photobooths",
+    logo: "/2024/Sponsor33.png",
+    category: "Photobooth Partner",
+  },
+  {
+    id: "prt-14",
+    name: "Art Esthetique",
+    urlPath: "cyberstrike.dcc/art-esthetique",
+    logo: "/2024/Sponsor05.png",
+    category: "Creative Partner",
+  },
+  {
+    id: "prt-15",
+    name: "Chatore",
+    urlPath: "cyberstrike.dcc/chatore",
+    logo: "/2024/Sponsor12.jpeg",
+    category: "Food Partner",
+  },
+  {
+    id: "prt-16",
+    name: "Dreq",
+    urlPath: "cyberstrike.dcc/dreq",
+    logo: "/2024/Sponsor01.webp",
+    category: "Apparel Partner",
+  },
+];
+
+export default function SponsorsPage() {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const cxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setIsMounted(true);
+    const timer = setTimeout(() => setIsLoaded(true), 60);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Generate random stars data with movement
-  interface Star {
-    id: number;
-    x: number;
-    y: number;
-    size: number;
-    animationDelay: number;
-    duration: number;
-    direction: 1 | -1;
-    speed: number;
-  }
+  // IntersectionObserver for heading reveals
+  useEffect(() => {
+    if (!isLoaded) return;
 
-  const generateStars = useCallback((count: number, seed: number): Star[] => {
-    let currentSeed = seed;
-    const seededRandom = () => {
-      currentSeed = (currentSeed * 9301 + 49297) % 233280;
-      return currentSeed / 233280;
-    };
+    const revealEls = document.querySelectorAll(".rv");
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+    revealEls.forEach((el) => io.observe(el));
 
-    return Array.from({ length: count }, (_, i) => ({
-      id: i,
-      x: seededRandom() * 100,
-      y: seededRandom() * 100,
-      size: seededRandom() * 3 + 1,
-      animationDelay: seededRandom() * 10,
-      duration: seededRandom() * 20 + 15,
-      direction: seededRandom() > 0.5 ? 1 : -1,
-      speed: seededRandom() * 0.5 + 0.2,
-    }));
+    return () => io.disconnect();
+  }, [isLoaded]);
+
+  // Subtle mouse parallax for the 3D floating cubes
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!cxRef.current) return;
+    const { clientX, clientY } = e;
+    const cx = (clientX / window.innerWidth - 0.5) * 40;
+    const cy = (clientY / window.innerHeight - 0.5) * 40;
+    cxRef.current.style.setProperty("--px", `${cx}`);
+    cxRef.current.style.setProperty("--py", `${cy}`);
   }, []);
 
-  const stars = useMemo(() => generateStars(150, 12345), [generateStars]);
-  const sparkleStars = useMemo(() => 60, []);
-
-  if (!isMounted) {
-    return null;
-  }
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [handleMouseMove]);
 
   return (
-    <section className="relative flex items-center md:items-start md:justify-start justify-center min-h-screen overflow-x-hidden w-full">
-      {/* Animated Stars Layer */}
-      <div className="absolute inset-0 w-full h-full z-10 pointer-events-none overflow-hidden">
-        {stars.slice(0, isMobile ? 80 : 150).map((star) => (
+    <div
+      className={`sponsor-root home-root ${isLoaded ? "go" : ""} ${anton.variable} ${dmSans.variable}`}
+    >
+      <Navbar />
+      <CustomCursor />
+
+      {/* ── HERO ───────────────────────────────────────────────────────── */}
+      <header className="hero" id="hero">
+        <div className="wrap">
+          <div className="hg2">
+            {/* Left Column: Editorial Headline & Actions */}
+            <div>
+              <div className="pill" style={{ marginBottom: 16 }}>
+                <i />
+                CYBERSTRIKE 2026 • DOT COM CLUB
+              </div>
+              <h1 className="h1 sh1" aria-label="Meet our sponsors.">
+                <s>
+                  <i>Meet our</i>
+                </s>
+                <s>
+                  <i>sponsors.</i>
+                </s>
+              </h1>
+              <p>
+                Every breakthrough needs a launchpad. Our sponsors power the
+                engineers, designers, and creators building the future at Jai
+                Hind College.
+              </p>
+              <div className="bt">
+                <a className="btn dk" href="#backers">
+                  See All Sponsors
+                </a>
+                <a
+                  className="btn wh"
+                  href="mailto:jhcdotcomclub.official@gmail.com"
+                >
+                  Become a Sponsor
+                </a>
+              </div>
+            </div>
+
+            {/* Right Column: Hero Astronaut Stage */}
+            <div className="stage s1">
+              <div className="sbg" />
+              <div className="bl a" />
+              <div className="bl b" />
+              <div className="rg" />
+              <div className="rg r2" />
+              <div className="pw">
+                <Image
+                  src="/images/sponsor-astronaut-hero.webp"
+                  alt="Cyberstrike Astronaut"
+                  width={600}
+                  height={750}
+                  priority
+                  className="as"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* ── STATEMENT: BETTER TOGETHER ──────────────────────────────────── */}
+      <section className="tier cnt">
+        <div className="wrap">
           <div
-            key={star.id}
-            className="absolute rounded-full bg-white animate-float-star"
+            className="pill"
+            style={{
+              background: "#1B1030",
+              color: "#F4EEFF",
+              marginBottom: 16,
+            }}
+          >
+            <i style={{ background: "#9E71FF" }} />
+            PARTNERSHIP MATTERS
+          </div>
+          <h2 className="hd rv">Better together.</h2>
+          <p className="lead">
+            Great tech festivals aren’t built alone. They’re fueled by companies
+            that believe in student innovation, open-source spirit, and the
+            relentless curiosity of the next generation.
+          </p>
+        </div>
+      </section>
+
+      {/* ── BACKED BY THE BEST: TITLE & POWERED BY SPONSORS ─────────────── */}
+      <section className="tier t-dk" id="backers">
+        {/* Floating 3D Cubes */}
+        <div className="cx" ref={cxRef} aria-hidden="true">
+          <div
+            className="cs"
             style={
               {
-                left: `${star.x}%`,
-                top: `${star.y}%`,
-                width: `${star.size}px`,
-                height: `${star.size}px`,
-                animationDelay: `${star.animationDelay}s`,
-                animationDuration: `${star.duration}s`,
-                boxShadow: `0 0 ${star.size * 3}px rgba(255, 255, 255, 0.6)`,
+                "--px": "4",
+                "--py": "8",
+                "--k": "0.05",
+                left: "3%",
+                top: "7%",
               } as React.CSSProperties
             }
           >
-            <div className="absolute inset-0 rounded-full bg-white animate-twinkle opacity-60"></div>
-          </div>
-        ))}
-
-        {/* Orbital stars */}
-        <div className="absolute top-[20%] left-[15%] w-3 h-3 bg-white rounded-full animate-orbital-1 opacity-80">
-          <div className="absolute inset-0 rounded-full bg-white animate-intense-twinkle"></div>
-        </div>
-        <div className="absolute top-[30%] right-[20%] w-2 h-2 bg-blue-200 rounded-full animate-orbital-2 opacity-70">
-          <div className="absolute inset-0 rounded-full bg-blue-200 animate-twinkle"></div>
-        </div>
-        <div className="absolute top-[60%] left-[25%] w-2.5 h-2.5 bg-purple-200 rounded-full animate-orbital-3 opacity-75">
-          <div className="absolute inset-0 rounded-full bg-purple-200 animate-intense-twinkle"></div>
-        </div>
-
-        {/* Falling stars */}
-        <div className="absolute top-[-5%] left-[10%] w-1.5 h-1.5 bg-white opacity-90 animate-falling-star-1"></div>
-        <div className="absolute top-[-5%] left-[50%] w-2 h-2 bg-blue-300 opacity-85 animate-falling-star-3"></div>
-        <div className="absolute top-[-5%] left-[85%] w-1 h-1 bg-cyan-300 opacity-70 animate-falling-star-5"></div>
-
-        {/* Twinkling background stars */}
-        <div className="absolute inset-0 animate-sparkle opacity-40">
-          {stars.slice(0, isMobile ? 30 : sparkleStars).map((star, i) => (
             <div
-              key={`sparkle-${i}`}
-              className="absolute w-0.5 h-0.5 bg-white rounded-full animate-twinkle"
-              style={{
-                left: `${star.x}%`,
-                top: `${star.y}%`,
-                animationDelay: `${star.animationDelay * 0.3}s`,
-                animationDuration: `${2 + star.speed * 3}s`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Hero Text Content - Left Aligned */}
-      <div className="relative z-20 px-4 sm:px-6 md:px-8 lg:pl-16 xl:pl-24 w-full md:w-1/2 lg:w-[45%] md:mt-32">
-        <h1
-          className={cn(
-            "text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 text-white leading-tight tracking-wide",
-            zentry.className
-          )}
-        >
-          Where Vision Meets{" "}
-          <span className={cn("text-red-500", zentry.className)}>SUPPORT</span>
-        </h1>
-        <p
-          className={cn(
-            "text-lg sm:text-xl md:text-2xl text-gray-300 mb-8 sm:mb-10 leading-relaxed",
-            satoshi.className
-          )}
-        >
-          Behind every hackathon, workshop, and event,
-          <br className="hidden sm:block" />
-          there&apos;s a sponsor who made it happen.
-        </p>
-        <Link
-          href="/contact-us"
-          className={cn(
-            "inline-block px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 bg-blue-600 text-white text-base sm:text-lg md:text-xl font-semibold rounded-full hover:bg-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 transform",
-            satoshi.className
-          )}
-        >
-          Become a Sponsor
-        </Link>
-        <p
-          className={cn(
-            "text-sm sm:text-base md:text-lg text-gray-400 mt-4 sm:mt-6",
-            satoshi.className
-          )}
-        >
-          Partner with us to shape what comes next.
-        </p>
-      </div>
-
-      {/* 3D Astronaut - Hidden on Mobile */}
-      {!isMobile && (
-        <figure
-          className="absolute right-0 top-0 bottom-0 z-30 hidden md:block md:w-1/2 lg:w-[55%]"
-          style={{ height: "100vh" }}
-        >
-          <Canvas camera={{ position: [0, 1, 3] }}>
-            <Suspense fallback={<Loader />}>
-              <Float>
-                <Astronaut scale={0.23} position={[-2.5, -1.5, 0]} />
-              </Float>
-              <Rig />
-            </Suspense>
-          </Canvas>
-        </figure>
-      )}
-    </section>
-  );
-};
-
-export default function Sponsors() {
-  return (
-    <>
-      <SponsorsHero />
-      <ParticleBackground />
-      <WaveAnimation />
-      <PageAnimatedGradient />
-      <main className="relative z-0 flex min-h-screen w-full flex-col items-center justify-start py-12 sm:py-16 md:py-20 px-4 sm:px-8 bg-transparent overflow-x-hidden">
-        <div className="w-full max-w-7xl mx-auto">
-          {/* 2025 Sponsors Section */}
-          <AnimatedHeader
-            title={
-              <>
-                Our{" "}
-                <span className={cn("text-red-500", zentry.className)}>
-                  2025
-                </span>{" "}
-                Sponsors
-              </>
+              className="fd"
+              style={
+                {
+                  "--t": "18s",
+                  "--dx": "14px",
+                  "--dy": "18px",
+                } as React.CSSProperties
+              }
+            >
+              <div
+                className="cube"
+                style={
+                  { "--s": "18px", "--t": "18s" } as React.CSSProperties
+                }
+              >
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
+          <div
+            className="cs"
+            style={
+              {
+                "--px": "-6",
+                "--py": "14",
+                "--k": "0.07",
+                right: "6%",
+                top: "11%",
+              } as React.CSSProperties
             }
-            subtitle="Thank you for believing in our vision and making innovation possible."
-            titleClassName={zentry.className}
-          />
-          <SponsorCarousel
-            rows={sponsorRowsData25}
-            defaultAnimationDuration="20s"
-          />
-
-          <div className="my-16 sm:my-20 md:my-24" />
-
-          {/* 2024 Sponsors Section */}
-          <AnimatedHeader
-            title={
-              <>
-                Our{" "}
-                <span className={cn("text-red-500", zentry.className)}>
-                  2024
-                </span>{" "}
-                Sponsors
-              </>
+          >
+            <div
+              className="fd"
+              style={
+                {
+                  "--t": "22s",
+                  "--dx": "-18px",
+                  "--dy": "22px",
+                } as React.CSSProperties
+              }
+            >
+              <div
+                className="cube"
+                style={
+                  { "--s": "26px", "--t": "22s" } as React.CSSProperties
+                }
+              >
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
+          <div
+            className="cs gt"
+            style={
+              {
+                "--px": "7",
+                "--py": "22",
+                "--k": "0.06",
+                left: "1%",
+                top: "38%",
+              } as React.CSSProperties
             }
-            subtitle="Celebrating our partners who helped make 2024 an incredible year."
-            titleClassName={zentry.className}
-          />
-          <SponsorCarousel
-            rows={sponsorRowsData24}
-            defaultAnimationDuration="20s"
-          />
+          >
+            <div
+              className="fd"
+              style={
+                {
+                  "--t": "25s",
+                  "--dx": "20px",
+                  "--dy": "-16px",
+                } as React.CSSProperties
+              }
+            >
+              <div
+                className="cube"
+                style={
+                  { "--s": "22px", "--t": "25s" } as React.CSSProperties
+                }
+              >
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
+          <div
+            className="cs gt"
+            style={
+              {
+                "--px": "-8",
+                "--py": "30",
+                "--k": "0.08",
+                right: "2%",
+                top: "56%",
+              } as React.CSSProperties
+            }
+          >
+            <div
+              className="fd"
+              style={
+                {
+                  "--t": "19s",
+                  "--dx": "-14px",
+                  "--dy": "24px",
+                } as React.CSSProperties
+              }
+            >
+              <div
+                className="cube"
+                style={
+                  { "--s": "32px", "--t": "19s" } as React.CSSProperties
+                }
+              >
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
+          <div
+            className="cs"
+            style={
+              {
+                "--px": "5",
+                "--py": "42",
+                "--k": "0.05",
+                left: "4%",
+                top: "72%",
+              } as React.CSSProperties
+            }
+          >
+            <div
+              className="fd"
+              style={
+                {
+                  "--t": "21s",
+                  "--dx": "16px",
+                  "--dy": "20px",
+                } as React.CSSProperties
+              }
+            >
+              <div
+                className="cube"
+                style={
+                  { "--s": "20px", "--t": "21s" } as React.CSSProperties
+                }
+              >
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
+          <div
+            className="cs"
+            style={
+              {
+                "--px": "-4",
+                "--py": "50",
+                "--k": "0.06",
+                right: "5%",
+                top: "88%",
+              } as React.CSSProperties
+            }
+          >
+            <div
+              className="fd"
+              style={
+                {
+                  "--t": "24s",
+                  "--dx": "-22px",
+                  "--dy": "-18px",
+                } as React.CSSProperties
+              }
+            >
+              <div
+                className="cube"
+                style={
+                  { "--s": "28px", "--t": "24s" } as React.CSSProperties
+                }
+              >
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-    </>
+
+        <div className="wrap">
+          <h2 className="hd rv">Backed by the best.</h2>
+          <p className="lead" style={{ color: "#B3A5D6", maxWidth: 640 }}>
+            From leading tech pioneers to hyper-growth innovators, meet the
+            visionary brands standing behind Cyberstrike 2026.
+          </p>
+
+          {/* 01 / Title Sponsor */}
+          <div className="tl">
+            01 / Title Sponsor <span>Exclusive Headline Partner</span>
+          </div>
+          <div className="sg g1">
+            <div className="sw dk">
+              <div className="sb">
+                <b />
+                <b />
+                <b />
+                <em>{TITLE_SPONSOR.urlPath}</em>
+              </div>
+              <div className="ss" style={{ padding: "16px 28px" }}>
+                <Image
+                  src={TITLE_SPONSOR.logo}
+                  alt={TITLE_SPONSOR.name}
+                  width={420}
+                  height={180}
+                  priority
+                  className="object-contain"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 02 / Powered By */}
+          <div className="tl">
+            02 / Powered By <span>Co-Presenting Partners</span>
+          </div>
+          <div className="sg g2">
+            {POWERED_BY.map((sponsor) => (
+              <div className="sw dk" key={sponsor.id}>
+                <div className="sb">
+                  <b />
+                  <b />
+                  <b />
+                  <em>{sponsor.urlPath}</em>
+                </div>
+                <div className="ss">
+                  <Image
+                    src={sponsor.logo}
+                    alt={sponsor.name}
+                    width={260}
+                    height={140}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── ASSOCIATE SPONSORS & PARTNERS ─────────────────────────────────── */}
+      <section className="tier cnt">
+        <div className="wrap">
+          {/* 03 / Associate Sponsors */}
+          <div className="tl">
+            03 / Associate Sponsors <span>Track & Category Leaders</span>
+          </div>
+          <div className="sg g4">
+            {ASSOCIATE_SPONSORS.map((sponsor) => (
+              <div className="sw" key={sponsor.id} title={sponsor.name}>
+                <div className="sb">
+                  <b />
+                  <b />
+                  <b />
+                  <em>{sponsor.urlPath}</em>
+                </div>
+                <div className="ss">
+                  <Image
+                    src={sponsor.logo}
+                    alt={sponsor.name}
+                    width={220}
+                    height={130}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 04 / Partners & Supporters */}
+          <div className="tl">
+            04 / Partners & Supporters <span>Community & Ecosystem</span>
+          </div>
+          <div className="sg g12">
+            {PARTNERS.map((partner) => (
+              <div className="sw" key={partner.id} title={partner.name}>
+                <div className="sb">
+                  <b />
+                  <b />
+                  <b />
+                  <em>{partner.urlPath}</em>
+                </div>
+                <div className="ss">
+                  <Image
+                    src={partner.logo}
+                    alt={partner.name}
+                    width={180}
+                    height={110}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            ))}
+
+            {/* Inquire New Partner Slot */}
+            <a
+              href="mailto:jhcdotcomclub.official@gmail.com?subject=Partner%20Inquiry%20Cyberstrike%202026"
+              className="sw"
+              style={{ textDecoration: "none" }}
+              title="Become a Partner"
+            >
+              <div className="sb">
+                <b />
+                <b />
+                <b />
+                <em>cyberstrike.dcc/your-brand</em>
+              </div>
+              <div className="ss empty">
+                <div>
+                  <b style={{ fontSize: "clamp(20px, 2.4vw, 28px)" }}>+ JOIN US</b>
+                  <span style={{ fontSize: 10, marginTop: 4, display: "block" }}>
+                    Partner Slot Open
+                  </span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── STACKED IMPACT CARDS: WHY PARTNER WITH US ─────────────────────── */}
+      <section className="tier t-dk">
+        <div className="wrap">
+          <h2 className="hd rv">Why partner with us.</h2>
+          <p className="lead" style={{ color: "#B3A5D6" }}>
+            Four reasons brands return to Cyberstrike year after year.
+          </p>
+
+          <div className="rs">
+            <div
+              style={
+                {
+                  "--i": "0",
+                  "--b": "#9E71FF",
+                  "--f": "#1B1030",
+                } as React.CSSProperties
+              }
+            >
+              <em>01 Be seen</em>
+              <div>
+                <h3>5,000+ TECH-FORWARD STUDENTS</h3>
+                <p>
+                  Unmatched on-campus and digital brand impressions across
+                  Mumbai's premier colleges and computer science faculties.
+                </p>
+              </div>
+            </div>
+
+            <div
+              style={
+                {
+                  "--i": "1",
+                  "--b": "#EDE5FF",
+                  "--f": "#1B1030",
+                } as React.CSSProperties
+              }
+            >
+              <em>02 Meet talent</em>
+              <div>
+                <h3>DIRECT HIRING PIPELINE</h3>
+                <p>
+                  Engage directly with passionate software engineers, UI/UX
+                  designers, and ethical hackers through hackathons and
+                  workshops.
+                </p>
+              </div>
+            </div>
+
+            <div
+              style={
+                {
+                  "--i": "2",
+                  "--b": "#5A2FC0",
+                  "--f": "#F4EEFF",
+                } as React.CSSProperties
+              }
+            >
+              <em>03 Back a cause</em>
+              <div>
+                <h3>RECORD-BREAKING E-WASTE DRIVE</h3>
+                <p>
+                  Align your brand with genuine sustainability. Over 2 tons of
+                  e-waste collected and responsibly recycled across college
+                  editions.
+                </p>
+              </div>
+            </div>
+
+            <div
+              style={
+                {
+                  "--i": "3",
+                  "--b": "#ffffff",
+                  "--f": "#1B1030",
+                } as React.CSSProperties
+              }
+            >
+              <em>04 Join the story</em>
+              <div>
+                <h3>OMNICHANNEL CREDITING</h3>
+                <p>
+                  Prominent placement across physical banners, official
+                  merchandise, website portals, and digital social campaigns.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA / WHY SECTION WITH ASTRONAUT ─────────────────────────────── */}
+      <section className="tier cta why" id="join">
+        <div className="wrap">
+          <div className="hg2">
+            <div>
+              <h2 className="hd rv">Be part of the story.</h2>
+              <p>
+                Custom packages, dedicated booths, track sponsorships, and
+                campus-wide branding opportunities are open for Cyberstrike
+                2026.
+              </p>
+              <div className="bt">
+                <a
+                  className="btn dk"
+                  href="mailto:jhcdotcomclub.official@gmail.com"
+                >
+                  Get in Touch
+                </a>
+                <a
+                  className="btn wh"
+                  href="mailto:jhcdotcomclub.official@gmail.com?subject=Cyberstrike%202026%20Sponsorship%20Brochure"
+                >
+                  Request Brochure
+                </a>
+              </div>
+            </div>
+
+            <div className="stage s2">
+              <div className="sbg" />
+              <div className="bl a" />
+              <div className="bl b" />
+              <div className="rg" />
+              <div className="rg r2" />
+              <div className="pw">
+                <Image
+                  src="/images/sponsor-astronaut-cta.webp"
+                  alt="Cyberstrike Astronaut in Orbit"
+                  width={600}
+                  height={750}
+                  priority
+                  className="as"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER (Same as /blogs) ───────────────────────────────────────── */}
+      <FooterSection />
+    </div>
   );
 }

@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 // Phone validation function for Indian numbers
 const validatePhoneNumber = (phone: string): boolean => {
   // Remove all spaces, hyphens, and parentheses
@@ -27,6 +25,16 @@ const validatePhoneNumber = (phone: string): boolean => {
 
 export async function POST(req: NextRequest) {
   try {
+    const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+    if (!convexUrl) {
+      console.error("NEXT_PUBLIC_CONVEX_URL is not configured");
+      return NextResponse.json(
+        { error: "Registration service is not configured" },
+        { status: 503 }
+      );
+    }
+
+    const convex = new ConvexHttpClient(convexUrl);
     const formData = await req.json();
     const { name, email, phone, department, departmentOther, year } = formData;
 

@@ -84,6 +84,33 @@ interface EditFormData {
   verificationStatus: "pending" | "verified" | "rejected";
 }
 
+const DocumentPreview = ({ url, alt }: { url: string; alt: string }) => {
+  if (url.toLowerCase().includes(".pdf")) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
+        className="text-sm text-blue-400 underline hover:text-blue-300"
+      >
+        Open PDF document
+      </a>
+    );
+  }
+
+  return (
+    <a href={url} target="_blank" rel="noreferrer">
+      <Image
+        src={url}
+        alt={alt}
+        width={300}
+        height={300}
+        className="h-auto max-h-48 w-full rounded border border-gray-600 bg-gray-800 object-contain sm:max-h-64"
+      />
+    </a>
+  );
+};
+
 const CLAdmin = () => {
   const { isAuthenticated, login, logout } = useAdminAuth();
   const registrations = useQuery(api.clRegistrations.listCLRegistrations);
@@ -749,12 +776,9 @@ const CLAdmin = () => {
                           Fee Receipt / College ID
                         </label>
                         <div className="mt-2">
-                          <Image
-                            src={selectedRegistration.clFeeReceiptUrl}
+                          <DocumentPreview
+                            url={selectedRegistration.clFeeReceiptUrl}
                             alt="CL Fee Receipt"
-                            width={300}
-                            height={300}
-                            className="w-full h-auto rounded border border-gray-600 max-h-48 sm:max-h-64 object-contain bg-gray-800"
                           />
                         </div>
                       </div>
@@ -763,12 +787,9 @@ const CLAdmin = () => {
                           Government ID
                         </label>
                         <div className="mt-2">
-                          <Image
-                            src={selectedRegistration.clGovtIdUrl}
+                          <DocumentPreview
+                            url={selectedRegistration.clGovtIdUrl}
                             alt="CL Government ID"
-                            width={300}
-                            height={300}
-                            className="w-full h-auto rounded border border-gray-600 max-h-48 sm:max-h-64 object-contain bg-gray-800"
                           />
                         </div>
                       </div>
@@ -784,12 +805,9 @@ const CLAdmin = () => {
                           Fee Receipt / College ID
                         </label>
                         <div className="mt-2">
-                          <Image
-                            src={selectedRegistration.aclFeeReceiptUrl}
+                          <DocumentPreview
+                            url={selectedRegistration.aclFeeReceiptUrl}
                             alt="ACL Fee Receipt"
-                            width={300}
-                            height={300}
-                            className="w-full h-auto rounded border border-gray-600 max-h-48 sm:max-h-64 object-contain bg-gray-800"
                           />
                         </div>
                       </div>
@@ -798,12 +816,9 @@ const CLAdmin = () => {
                           Government ID
                         </label>
                         <div className="mt-2">
-                          <Image
-                            src={selectedRegistration.aclGovtIdUrl}
+                          <DocumentPreview
+                            url={selectedRegistration.aclGovtIdUrl}
                             alt="ACL Government ID"
-                            width={300}
-                            height={300}
-                            className="w-full h-auto rounded border border-gray-600 max-h-48 sm:max-h-64 object-contain bg-gray-800"
                           />
                         </div>
                       </div>
